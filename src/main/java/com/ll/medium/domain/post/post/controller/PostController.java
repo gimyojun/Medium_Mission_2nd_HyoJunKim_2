@@ -34,15 +34,8 @@ public class PostController {
 
         Post myPost = post.get();
         if (myPost.isPaid()) {
-            if (!rq.isLogin()) {
-                rq.historyBack("유료 멤버십 컨텐츠는 로그인 후 이용 가능합니다.");
-
-            }
-            if (!rq.isPaid()) {
-                rq.historyBack("유료 멤버십이 필요한 컨텐츠입니다. 멤버십을 구매해주세요.");
-
-            }
-
+            if (!rq.isLogin()) return rq.redirect("/post/list","유료 멤버십 컨텐츠는 로그인 후 이용 가능합니다.");
+            if (!rq.isPaid()) return rq.redirect("/post/list","유료 멤버십이 필요한 컨텐츠입니다. 멤버십을 구매해주세요.");
         }
 
         rq.setAttribute("post", myPost);

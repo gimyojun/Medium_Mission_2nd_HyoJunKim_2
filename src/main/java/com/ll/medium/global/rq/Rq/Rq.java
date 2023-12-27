@@ -14,6 +14,7 @@ import org.springframework.web.context.annotation.RequestScope;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Date;
 import java.util.Optional;
 
 @Component
@@ -23,22 +24,22 @@ public class Rq {
     private final HttpServletRequest request;
     private final HttpServletResponse response;
 
+
     public String redirect(String url, String msg) {
-        msg = URLEncoder.encode(msg, StandardCharsets.UTF_8);
+        if(msg == null){
+            return "redirect:" + url;
+        }
+        boolean containsTtl = msg.contains(";ttl=");
 
-        StringBuilder sb = new StringBuilder();
-
-        sb.append("redirect:");
-        sb.append(url);
-
-        if (msg != null) {
-            sb.append("?msg=");
-            sb.append(msg);
+        if (containsTtl) {
+            msg = msg.split(";ttl=", 2)[0];
         }
 
-        return sb.toString();
-    }
+        msg = URLEncoder.encode(msg, StandardCharsets.UTF_8);
+        msg += ";ttl=" + (new Date().getTime() + 1000 * 5);
 
+        return "redirect:" + url + "?msg=" + msg;
+    }
     public String historyBack(String msg) {
         request.setAttribute("failMsg", msg);
 
@@ -77,7 +78,7 @@ public class Rq {
                 .anyMatch(it -> it.getAuthority().equals("ROLE_ADMIN"));
     }
     public boolean isPaid() {
-
+        if(isLogout())return false;
         return getUser()
                 .getAuthorities()
                 .stream()
