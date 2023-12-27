@@ -40,7 +40,7 @@ public class MemberController {
     @PreAuthorize("isAnonymous()")
     @PostMapping("/join")
     public String join(@Valid JoinForm joinForm) {
-        RsData<Member> joinRs = memberService.join(joinForm.getUsername(), joinForm.getPassword());
+        RsData<Member> joinRs = memberService.join(joinForm.getUsername(), joinForm.getPassword(), false);
 
         return rq.redirectOrBack(joinRs, "/member/login");
     }

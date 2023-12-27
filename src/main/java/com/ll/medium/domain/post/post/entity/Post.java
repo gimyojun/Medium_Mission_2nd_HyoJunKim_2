@@ -23,13 +23,22 @@ public class Post {
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
+
     @CreatedDate
     private LocalDateTime createDate;
+
     @LastModifiedDate
     private LocalDateTime modifyDate;
+
     @ManyToOne(fetch = FetchType.LAZY)
     private Member author;
+
     private String title;
+
     private String body;
+
     private boolean isPublished;
+
+    private boolean isPaid;
+
 }

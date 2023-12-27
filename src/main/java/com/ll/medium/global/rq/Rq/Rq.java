@@ -76,6 +76,13 @@ public class Rq {
                 .stream()
                 .anyMatch(it -> it.getAuthority().equals("ROLE_ADMIN"));
     }
+    public boolean isPaid() {
+
+        return getUser()
+                .getAuthorities()
+                .stream()
+                .anyMatch(it -> it.getAuthority().equals("ROLE_PAID"));
+    }
 
     public void setAttribute(String key, Object value) {
         request.setAttribute(key, value);

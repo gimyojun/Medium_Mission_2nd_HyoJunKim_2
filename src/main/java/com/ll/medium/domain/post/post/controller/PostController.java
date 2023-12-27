@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/post")
@@ -26,9 +27,27 @@ public class PostController {
 
     @GetMapping("/{id}")
     public String showDetail(@PathVariable long id) {
-        rq.setAttribute("post", postService.findById(id).get());
 
+        Optional<Post> post = postService.findById(id);
+        if(post.isEmpty())
+            throw new RuntimeException("포스트를 찾을 수 없습니다.");
+
+        Post myPost = post.get();
+        if (myPost.isPaid()) {
+            if (!rq.isLogin()) {
+                rq.historyBack("유료 멤버십 컨텐츠는 로그인 후 이용 가능합니다.");
+
+            }
+            if (!rq.isPaid()) {
+                rq.historyBack("유료 멤버십이 필요한 컨텐츠입니다. 멤버십을 구매해주세요.");
+
+            }
+
+        }
+
+        rq.setAttribute("post", myPost);
         return "domain/post/post/detail";
+
     }
 
     @GetMapping("/list")

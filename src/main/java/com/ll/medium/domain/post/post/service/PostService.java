@@ -18,12 +18,13 @@ public class PostService {
     private final PostRepository postRepository;
 
     @Transactional
-    public void write(Member author, String title, String body, boolean isPublished) {
+    public void write(Member author, String title, String body, boolean isPublished, boolean isPaid) {
         Post post = Post.builder()
                 .author(author)
                 .title(title)
                 .body(body)
                 .isPublished(isPublished)
+                .isPaid(isPaid)
                 .build();
 
         postRepository.save(post);
