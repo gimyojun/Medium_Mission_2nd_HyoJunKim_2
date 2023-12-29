@@ -1,5 +1,7 @@
 package com.ll.medium.global.rq.Rq;
 
+import com.ll.medium.domain.member.member.entity.Member;
+import com.ll.medium.domain.member.member.service.MemberService;
 import com.ll.medium.global.rsData.RsData.RsData;
 import com.ll.medium.standard.util.Ut.Ut;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,7 +25,7 @@ import java.util.Optional;
 public class Rq {
     private final HttpServletRequest request;
     private final HttpServletResponse response;
-
+    private final MemberService memberService;
 
     public String redirect(String url, String msg) {
         if(msg == null){
@@ -99,5 +101,13 @@ public class Rq {
         queryString = Ut.url.deleteQueryParam(queryString, paramName);
 
         return queryString;
+    }
+
+    //현재 로그인된 멤버 이름을 통해 객체를 반환
+    public Member getLoginedMember(){
+        if (isLogout())
+            return null;
+        Member member = memberService.findByUsername(this.getUser().getUsername()).get();
+        return member;
     }
 }

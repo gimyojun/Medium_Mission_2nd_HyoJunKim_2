@@ -25,23 +25,25 @@ public class NotProd {
     @Order(3)
     public ApplicationRunner initNotProd() {
         return args -> {
+            // 이미 회원이 존재하는 경우 초기화를 수행하지 않음
             if (memberService.findByUsername("user1").isPresent()) return;
 
-            Member memberUser1 = memberService.join("user1", "123",true).getData();
-            Member memberUser2 = memberService.join("user2", "123",false).getData();
-            Member memberUser3 = memberService.join("user3", "123",false).getData();
+            // 유료멤버십 회원 생성
+            IntStream.rangeClosed(1, 100).forEach(i -> {
+                boolean isPaidMember = i % 2 == 0; // 홀수는 유료, 짝수는 무료
+                memberService.join("user" + i, "123", isPaidMember);
+            });
 
+            // 유료글 생성
+            IntStream.rangeClosed(1, 100).forEach(i -> {
+                Member member = memberService.findByUsername("user" + i).orElseThrow();
 
-            postService.write(memberUser1, "유료 제목 1", "유료 내용 1", true,true);
-            postService.write(memberUser1, "유료 제목 2", "유료 내용 2", false,true);
-
-
-            postService.write(memberUser2, "제목 3", "내용 3", true,false);
-            postService.write(memberUser2, "제목 4", "내용 4", false,false);
-
-            IntStream.rangeClosed(5, 50).forEach(i -> {
-                postService.write(memberUser3, "제목 " + i, "내용 " + i, true,false);
+                boolean isPaidPost = i % 2 == 0; // 홀수는 유료, 짝수는 무료
+                boolean isPublished = i % 3 != 0; // 1/3의 확률로 공개글
+                postService.write(member, "제목 " + i, "내용 " + i,  isPublished, isPaidPost);
             });
         };
+
+
     }
 }
