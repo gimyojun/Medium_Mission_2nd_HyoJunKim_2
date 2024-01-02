@@ -7,18 +7,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class PostService {
     private final PostRepository postRepository;
 
-    @Transactional
+
     public void write(Member author, String title, String body, boolean isPublished, boolean isPaid) {
         Post post = Post.builder()
                 .author(author)
@@ -42,4 +40,27 @@ public class PostService {
     public Page<Post> search(List<String> kwTypes, String kw, Pageable pageable) {
         return postRepository.search(kwTypes, kw, pageable);
     }
+
+    public Post likePost(Long id) {
+        Optional<Post> op = postRepository.findById(id);
+        if (op.isPresent()) {
+            Post post = op.get();
+            Long currentLikeCount = post.getLikeCount();
+            post.setLikeCount(currentLikeCount + 1);
+            return postRepository.save(post);
+        }else {
+            throw new RuntimeException("like count 올릴수 없음");
+        }
+
+    }
+
+
+    public void hitPost(Post myPost) {
+        Long currentHitCount = myPost.getHitCount();
+        myPost.setHitCount(currentHitCount + 1);
+        postRepository.save(myPost);
+
+    }
+
+
 }

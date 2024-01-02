@@ -45,6 +45,7 @@ public class PostController {
             if (!rq.isLogin()) return rq.redirect("/post/list","유료 멤버십 컨텐츠는 로그인 후 이용 가능합니다.");
             if (!rq.isPaid()) return rq.redirect("/post/list","유료 멤버십이 필요한 컨텐츠입니다. 멤버십을 구매해주세요.");
         }
+        postService.hitPost(myPost);
 
         rq.setAttribute("post", myPost);
         return "domain/post/post/detail";
@@ -55,10 +56,27 @@ public class PostController {
     public String showList(
             @RequestParam(value = "kwType", defaultValue = "title,body") List<String> kwTypes,
             @RequestParam(defaultValue = "") String kw,
-            @RequestParam(defaultValue = "1") int page
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(value = "sortCode", defaultValue = "idDesc") String sortCode
     ) {
         List<Sort.Order> sorts = new ArrayList<>();
-        sorts.add(Sort.Order.desc("id"));
+
+        switch (sortCode) {
+            case "idDesc":
+                sorts.add(Sort.Order.desc("id"));
+                break;
+            case "idAsc":
+                sorts.add(Sort.Order.asc("id"));
+                break;
+            case "hitCountDesc":
+                sorts.add(Sort.Order.desc("hitCount"));
+                break;
+            case "likeCountDesc":
+                sorts.add(Sort.Order.desc("likeCount"));
+                break;
+            // 추가적인 정렬 조건이 필요하면 여기에 추가
+        }
+
         Pageable pageable = PageRequest.of(page - 1, 10, Sort.by(sorts));
 
         Page<Post> postPage = postService.search(kwTypes ,kw, pageable);
@@ -112,8 +130,12 @@ public class PostController {
 
     }
 
-
-
+    @GetMapping("/{id}/like")
+    public String like(@PathVariable Long id) {
+        Post post = postService.likePost(id);
+        rq.setAttribute("post", post);
+        return "domain/post/post/detail";
+    }
 
 
 }

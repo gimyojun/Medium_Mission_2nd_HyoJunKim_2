@@ -20,7 +20,12 @@
     </div>
 
     <hr>
-
+    <div>
+        <a th:if="${@rq.isLogin() }" th:href="@{|/post/${post.id}/like|}" class="recommend btn btn-sm btn-outline-secondary">
+            like
+            <span class="badge rounded-pill bg-success" th:text="${post.likeCount}"></span>
+        </a>
+    </div>
     <div>
         <button onclick="history.back();">뒤로가기</button>
     </div>

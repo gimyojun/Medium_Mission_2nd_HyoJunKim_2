@@ -41,4 +41,9 @@ public class Post {
 
     private boolean isPaid;
 
+    @Column(nullable = false)
+    private Long hitCount = 0L;
+
+    @Column(nullable = false)
+    private Long likeCount = 0L;
 }

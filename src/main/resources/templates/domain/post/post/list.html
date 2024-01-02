@@ -36,6 +36,23 @@
                           th:checked="${kwTypesMap['title']}"><span>제목</span></label>
             <label><input type="checkbox" name="kwType" value="body"
                           th:checked="${kwTypesMap['body']}"><span>내용</span></label>
+            <div>
+                <label for="sortCode">정렬:</label>
+                <select id="sortCode" name="sortCode">
+                    <option value=""></option>
+                    <option value="idAsc">오래된 순</option>
+                    <option value="hitCountDesc">조회수 높은순</option>
+                    <option value="likeCountDesc">추천 높은순</option>
+
+                </select>
+            </div>
+
+
+
+
+
+
+
         </div>
         <input type="search" name="kw" placeholder="검색어" th:value="${param.kw}">
         <input type="submit" value="검색">
@@ -50,6 +67,8 @@
             <th>내용</th>
             <th>글쓴이</th>
             <th>작성일시</th>
+            <th>조회수</th>
+            <th>좋아요</th>
         </tr>
         </thead>
 
@@ -73,6 +92,8 @@
             <td><a th:href="@{|/post/${post.id}|}" th:text="${post.body}"></a></td>
             <td><a th:if="${@rq.getLoginedMember() != null}" th:text="${@rq.getLoginedMember().getUsername()}"></a></td>
             <td th:text="${#temporals.format(post.createDate, 'yyyy-MM-dd HH:mm')}"></td>
+            <td><a th:text="${post.hitCount}"></a></td>
+            <td><a th:text="${post.likeCount}"></a></td>
         </tr>
         </tbody>
     </table>
