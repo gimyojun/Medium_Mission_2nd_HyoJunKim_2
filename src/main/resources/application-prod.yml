@@ -12,7 +12,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
 logging:
   level:
     com.ll.medium: INFO
@@ -23,6 +23,6 @@ logging:
 custom:
   tempDirPath: /gen/temp
   site:
-    baseUrl: "https://www.s-code.io"
+    baseUrl: "https://www.medium.hyojunkim.site"
   genFile:
     dirPath: /gen
