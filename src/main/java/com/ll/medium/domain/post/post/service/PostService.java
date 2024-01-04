@@ -24,6 +24,8 @@ public class PostService {
                 .body(body)
                 .isPublished(isPublished)
                 .isPaid(isPaid)
+                .hitCount(0L)
+                .likeCount(0L)
                 .build();
 
         postRepository.save(post);

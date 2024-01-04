@@ -39,6 +39,7 @@
             <div>
                 <label for="sortCode">정렬:</label>
                 <select id="sortCode" name="sortCode">
+                <!--TODO 뒤로가기 할 때 소팅된 상태로 만들기-->
                     <option value=""></option>
                     <option value="idAsc">오래된 순</option>
                     <option value="hitCountDesc">조회수 높은순</option>
@@ -90,7 +91,7 @@
 <!--                </span>-->
             </td>
             <td><a th:href="@{|/post/${post.id}|}" th:text="${post.body}"></a></td>
-            <td><a th:if="${@rq.getLoginedMember() != null}" th:text="${@rq.getLoginedMember().getUsername()}"></a></td>
+            <td> <a th:text="${post.author.username}"></a></td>
             <td th:text="${#temporals.format(post.createDate, 'yyyy-MM-dd HH:mm')}"></td>
             <td><a th:text="${post.hitCount}"></a></td>
             <td><a th:text="${post.likeCount}"></a></td>

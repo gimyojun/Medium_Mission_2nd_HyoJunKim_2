@@ -2,6 +2,7 @@ package com.ll.medium.global.rq.Rq;
 
 import com.ll.medium.domain.member.member.entity.Member;
 import com.ll.medium.domain.member.member.service.MemberService;
+import com.ll.medium.global.auth.CustomUserDetails;
 import com.ll.medium.global.rsData.RsData.RsData;
 import com.ll.medium.standard.util.Ut.Ut;
 import jakarta.servlet.http.HttpServletRequest;
@@ -62,9 +63,16 @@ public class Rq {
                 .map(it -> (User) it)
                 .orElse(null);
     }
+    public CustomUserDetails getCurrentUser() {
+        return Optional.ofNullable(SecurityContextHolder.getContext())
+                .map(SecurityContext::getAuthentication)
+                .filter(authentication -> authentication.getPrincipal() instanceof CustomUserDetails)
+                .map(authentication -> (CustomUserDetails) authentication.getPrincipal())
+                .orElse(null);
+    }
 
     public boolean isLogin() {
-        return getUser() != null;
+        return getCurrentUser() != null;
     }
 
     public boolean isLogout() {
@@ -107,7 +115,7 @@ public class Rq {
     public Member getLoginedMember(){
         if (isLogout())
             return null;
-        Member member = memberService.findByUsername(this.getUser().getUsername()).get();
+        Member member = memberService.findByUsername(this.getCurrentUser().getUsername()).get();
         return member;
     }
 }

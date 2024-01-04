@@ -40,7 +40,6 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
             if (kwTypes.contains("body")) {
                 conditions.add(post.body.containsIgnoreCase(kw));
             }
-
             // 조건 리스트를 or 조건으로 결합합니다.
             BooleanExpression combinedCondition = conditions.stream()
                     .reduce(BooleanExpression::or)
@@ -51,7 +50,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
                 builder.and(combinedCondition);
             }
         }
-
+        builder.and(post.isPublished.isTrue());
         JPAQuery<Post> postQuery = jpaQueryFactory
                 .select(post)
                 .from(post)

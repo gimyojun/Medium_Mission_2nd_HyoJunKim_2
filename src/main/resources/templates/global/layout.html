@@ -17,7 +17,10 @@
     </script>
 </head>
 <body>
-
+<div th:if="${@rq.login}">
+    <span th:if="${@rq.getLoginedMember() != null}" th:text="${@rq.getLoginedMember().getNickname() ?: @rq.getLoginedMember().getUsername()}"></span>
+    님 환영합니다.
+</div>
 <th:block layout:fragment="header"></th:block>
 
 <th:block layout:fragment="content"></th:block>

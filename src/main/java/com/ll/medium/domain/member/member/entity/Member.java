@@ -43,6 +43,9 @@ public class Member {
 
     private boolean isPaid;
 
+    private String nickname;
+
+
 
 
     public Collection<? extends GrantedAuthority> getAuthorities() {
