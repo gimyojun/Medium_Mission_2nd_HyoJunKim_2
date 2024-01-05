@@ -14,10 +14,10 @@ import org.springframework.core.annotation.Order;
 import java.util.stream.IntStream;
 
 @Configuration
-@Profile("!prod")
 @Slf4j
+@Profile("prod")
 @RequiredArgsConstructor
-public class NotProd {
+public class Prod {
     private final MemberService memberService;
     private final PostService postService;
 

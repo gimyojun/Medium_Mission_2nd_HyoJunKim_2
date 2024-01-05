@@ -1,9 +1,8 @@
-package com.ll.medium.global.security;
+package com.ll.medium.global.auth;
 
 import com.ll.medium.domain.member.member.entity.Member;
 import com.ll.medium.domain.member.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -29,10 +28,13 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         Member member = opMember.get();
 
-        return new User(
-                member.getUsername(),
-                member.getPassword(),
-                member.getAuthorities()
-        );
+        //CustomUserDetails객체로 회원가입 회원과 소셜회원 로그인 통합
+        return new CustomUserDetails(member);
+//        return new User(
+//                member.getUsername(),
+//                member.getPassword(),
+//                member.getAuthorities()
+//        );
+
     }
 }

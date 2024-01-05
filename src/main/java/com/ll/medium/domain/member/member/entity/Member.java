@@ -30,12 +30,23 @@ public class Member {
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
+
     @CreatedDate
     private LocalDateTime createDate;
+
     @LastModifiedDate
     private LocalDateTime modifyDate;
+
     private String username;
+
     private String password;
+
+    private boolean isPaid;
+
+    private String nickname;
+
+
+
 
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> authorities = new ArrayList<>();
@@ -44,8 +55,15 @@ public class Member {
 
         if (List.of("system", "admin").contains(username)) {
             authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
+            //어드민은 유료 멤버십 글을 볼 수 있어야한다.
+            authorities.add(new SimpleGrantedAuthority("ROLE_PAID"));
+        }
+        if(this.isPaid()){
+            authorities.add(new SimpleGrantedAuthority("ROLE_PAID"));
         }
 
         return authorities;
     }
+
+
 }

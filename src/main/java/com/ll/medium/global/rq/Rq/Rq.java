@@ -1,5 +1,8 @@
 package com.ll.medium.global.rq.Rq;
 
+import com.ll.medium.domain.member.member.entity.Member;
+import com.ll.medium.domain.member.member.service.MemberService;
+import com.ll.medium.global.auth.CustomUserDetails;
 import com.ll.medium.global.rsData.RsData.RsData;
 import com.ll.medium.standard.util.Ut.Ut;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,6 +17,7 @@ import org.springframework.web.context.annotation.RequestScope;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Date;
 import java.util.Optional;
 
 @Component
@@ -22,23 +26,23 @@ import java.util.Optional;
 public class Rq {
     private final HttpServletRequest request;
     private final HttpServletResponse response;
+    private final MemberService memberService;
 
     public String redirect(String url, String msg) {
-        msg = URLEncoder.encode(msg, StandardCharsets.UTF_8);
+        if(msg == null){
+            return "redirect:" + url;
+        }
+        boolean containsTtl = msg.contains(";ttl=");
 
-        StringBuilder sb = new StringBuilder();
-
-        sb.append("redirect:");
-        sb.append(url);
-
-        if (msg != null) {
-            sb.append("?msg=");
-            sb.append(msg);
+        if (containsTtl) {
+            msg = msg.split(";ttl=", 2)[0];
         }
 
-        return sb.toString();
-    }
+        msg = URLEncoder.encode(msg, StandardCharsets.UTF_8);
+        msg += ";ttl=" + (new Date().getTime() + 1000 * 5);
 
+        return "redirect:" + url + "?msg=" + msg;
+    }
     public String historyBack(String msg) {
         request.setAttribute("failMsg", msg);
 
@@ -59,9 +63,16 @@ public class Rq {
                 .map(it -> (User) it)
                 .orElse(null);
     }
+    public CustomUserDetails getCurrentUser() {
+        return Optional.ofNullable(SecurityContextHolder.getContext())
+                .map(SecurityContext::getAuthentication)
+                .filter(authentication -> authentication.getPrincipal() instanceof CustomUserDetails)
+                .map(authentication -> (CustomUserDetails) authentication.getPrincipal())
+                .orElse(null);
+    }
 
     public boolean isLogin() {
-        return getUser() != null;
+        return getCurrentUser() != null;
     }
 
     public boolean isLogout() {
@@ -75,6 +86,13 @@ public class Rq {
                 .getAuthorities()
                 .stream()
                 .anyMatch(it -> it.getAuthority().equals("ROLE_ADMIN"));
+    }
+    public boolean isPaid() {
+        if(isLogout())return false;
+        return getUser()
+                .getAuthorities()
+                .stream()
+                .anyMatch(it -> it.getAuthority().equals("ROLE_PAID"));
     }
 
     public void setAttribute(String key, Object value) {
@@ -91,5 +109,13 @@ public class Rq {
         queryString = Ut.url.deleteQueryParam(queryString, paramName);
 
         return queryString;
+    }
+
+    //현재 로그인된 멤버 이름을 통해 객체를 반환
+    public Member getLoginedMember(){
+        if (isLogout())
+            return null;
+        Member member = memberService.findByUsername(this.getCurrentUser().getUsername()).get();
+        return member;
     }
 }
