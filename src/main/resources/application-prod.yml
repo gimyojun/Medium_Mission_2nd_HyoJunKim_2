@@ -9,3 +9,9 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+custom:
+  tempDirPath: /gen/temp
+  site:
+    baseUrl: "https://medium.hyojunkim.site"
+  genFile:
+    dirPath: /gen

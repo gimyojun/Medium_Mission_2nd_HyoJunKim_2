@@ -7,3 +7,9 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create
+custom:
+  site:
+    baseUrl: "http://localhost:8090"
+  tempDirPath: c:/temp/medium_test/temp
+  genFile:
+    dirPath: c:/temp/medium_test

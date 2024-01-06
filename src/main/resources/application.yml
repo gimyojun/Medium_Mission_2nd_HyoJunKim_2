@@ -41,3 +41,10 @@ logging:
     org.hibernate.orm.jdbc.bind: TRACE
     org.hibernate.orm.jdbc.extract: TRACE
     org.springframework.transaction.interceptor: TRACE
+custom:
+  site:
+    name: medium
+    baseUrl: "http://localhost:${server.port}"
+  tempDirPath: c:/temp/medium_dev/temp
+  genFile:
+    dirPath: c:/temp/medium_dev
