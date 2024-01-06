@@ -1,34 +1,25 @@
 package com.ll.medium.domain.post.post.entity;
 
 import com.ll.medium.domain.member.member.entity.Member;
-import jakarta.persistence.*;
+import com.ll.medium.global.jpa.BaseEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ManyToOne;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import lombok.experimental.SuperBuilder;
 
-import java.time.LocalDateTime;
-
-import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
 @Entity
-@NoArgsConstructor(access = PROTECTED)
+@SuperBuilder
 @AllArgsConstructor(access = PROTECTED)
-@Builder
+@NoArgsConstructor(access = PROTECTED)
 @Getter
 @Setter
-@EntityListeners(AuditingEntityListener.class)
-public class Post {
-    @Id
-    @GeneratedValue(strategy = IDENTITY)
-    private Long id;
+@ToString(callSuper = true)
+public class Post extends BaseEntity {
 
-    @CreatedDate
-    private LocalDateTime createDate;
-
-    @LastModifiedDate
-    private LocalDateTime modifyDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Member author;

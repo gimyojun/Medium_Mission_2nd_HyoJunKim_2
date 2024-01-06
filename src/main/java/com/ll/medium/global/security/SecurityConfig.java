@@ -25,6 +25,7 @@ public class SecurityConfig {
         http
                 .authorizeRequests(authorizeRequests ->
                         authorizeRequests
+                                //먼저쓴것부터 적용된다
                                 .requestMatchers("/gen/**")
                                 .permitAll()
                                 .requestMatchers("/resource/**")
@@ -63,6 +64,7 @@ public class SecurityConfig {
                 .logout(
                         logout ->
                                 logout
+                                        //get요청도 로그아웃 가능
                                         .logoutRequestMatcher(new AntPathRequestMatcher("/member/logout"))
                 );
 
