@@ -1,12 +1,9 @@
 spring:
   datasource:
     url: jdbc:mysql://172.17.0.1:3306/medium_test
+    username: root
+    password: lldj123414
+    driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
       ddl-auto: create
-custom:
-  site:
-    baseUrl: "http://localhost:8080"
-  tempDirPath: c:/temp/medium_test/temp
-  genFile:
-    dirPath: c:/temp/medium_test
