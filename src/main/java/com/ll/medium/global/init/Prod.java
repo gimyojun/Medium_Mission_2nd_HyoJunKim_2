@@ -15,6 +15,7 @@ import java.util.stream.IntStream;
 
 @Configuration
 @Slf4j
+//application.yml의 profiles.active가 prod일경우만 실행되는것
 @Profile("prod")
 @RequiredArgsConstructor
 public class Prod {

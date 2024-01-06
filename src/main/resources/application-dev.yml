@@ -1,3 +1,4 @@
+#개발환경의 특징들
 server:
   port: 8090
 spring:
@@ -6,3 +7,8 @@ spring:
   output:
     ansi:
       enabled: always
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/medium_dev
+    username: root
+    password: Alslehfk1@
+    driver-class-name: com.mysql.cj.jdbc.Driver

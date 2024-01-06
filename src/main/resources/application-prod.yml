@@ -1,10 +1,6 @@
 server:
   shutdown: graceful
 spring:
-  servlet:
-    multipart:
-      max-file-size: 5MB
-      max-request-size: 5MB
   datasource:
     url: jdbc:mysql://172.17.0.1:3306/medium_prod
     username: root
@@ -12,17 +8,4 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
-      ddl-auto: create
-logging:
-  level:
-    com.ll.medium: INFO
-    org.hibernate.SQL: INFO
-    org.hibernate.orm.jdbc.bind: INFO
-    org.hibernate.orm.jdbc.extract: INFO
-    org.springframework.transaction.interceptor: INFO
-custom:
-  tempDirPath: /gen/temp
-  site:
-    baseUrl: "https://www.medium.hyojunkim.site"
-  genFile:
-    dirPath: /gen
+      ddl-auto: update
