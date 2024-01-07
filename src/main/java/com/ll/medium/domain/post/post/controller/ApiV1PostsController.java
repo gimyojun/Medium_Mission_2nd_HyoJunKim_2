@@ -7,6 +7,7 @@ import com.ll.medium.global.rsData.RsData.RsData;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -35,5 +36,16 @@ public class ApiV1PostsController {
     @GetMapping("")
     public RsData<GetPostsResponseBody> getPosts(){
         return RsData.of("200", "success", new GetPostsResponseBody(postService.findAllByOrderByIdDesc()));
+    }
+    @Getter
+    public static class GetPostResponseBody{
+        private final PostDto result;
+        public GetPostResponseBody(Post post) {
+            result = new PostDto(post);
+        }
+    }
+    @GetMapping("/{id}")
+    public RsData<GetPostResponseBody> getPost(@PathVariable Long id){
+        return RsData.of("200", "success", new GetPostResponseBody(postService.findById(id).get()));
     }
 }

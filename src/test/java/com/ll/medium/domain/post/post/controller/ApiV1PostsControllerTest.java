@@ -43,11 +43,30 @@ public class ApiV1PostsControllerTest {
                 .andExpect(jsonPath("$.data.result[0].authorName", notNullValue()))
                 .andExpect(jsonPath("$.data.result[0].createDate", matchesPattern(DATE_PATTERN)))
                 .andExpect(jsonPath("$.data.result[0].modifyDate", matchesPattern(DATE_PATTERN)))
-
-
                 .andDo(print());
     }
+    @Test
+    @DisplayName("get /api/v1/posts/{id}")
+    void t2() throws Exception{
+        //given
 
+        //when
+        ResultActions resultActions = mockMvc.perform(get("/api/v1/posts/100"))
+                .andDo(print());
+        //then
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(handler().handlerType(ApiV1PostsController.class))
+                .andExpect(handler().methodName("getPost"))
+                .andExpect(jsonPath("$.data.result.id", instanceOf(Number.class)))
+                .andExpect(jsonPath("$.data.result.title", notNullValue()))
+                .andExpect(jsonPath("$.data.result.body", notNullValue()))
+                .andExpect(jsonPath("$.data.result.authorId",instanceOf(Number.class)))
+                .andExpect(jsonPath("$.data.result.authorName", notNullValue()))
+                .andExpect(jsonPath("$.data.result.createDate", matchesPattern(DATE_PATTERN)))
+                .andExpect(jsonPath("$.data.result.modifyDate", matchesPattern(DATE_PATTERN)))
+                .andDo(print());
+    }
 
 
 
