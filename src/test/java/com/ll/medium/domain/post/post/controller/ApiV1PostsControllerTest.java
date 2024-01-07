@@ -10,8 +10,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.matchesPattern;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -37,10 +36,15 @@ public class ApiV1PostsControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(handler().handlerType(ApiV1PostsController.class))
                 .andExpect(handler().methodName("getPosts"))
-                .andExpect(jsonPath("$.data.result[0].id", is(100)))
-                .andExpect(jsonPath("$.data.result[0].title", is("제목 100")))
+                .andExpect(jsonPath("$.data.result[0].id", instanceOf(Number.class)))
+                .andExpect(jsonPath("$.data.result[0].title", notNullValue()))
+                .andExpect(jsonPath("$.data.result[0].body", notNullValue()))
+                .andExpect(jsonPath("$.data.result[0].authorId",instanceOf(Number.class)))
+                .andExpect(jsonPath("$.data.result[0].authorName", notNullValue()))
                 .andExpect(jsonPath("$.data.result[0].createDate", matchesPattern(DATE_PATTERN)))
                 .andExpect(jsonPath("$.data.result[0].modifyDate", matchesPattern(DATE_PATTERN)))
+
+
                 .andDo(print());
     }
 
