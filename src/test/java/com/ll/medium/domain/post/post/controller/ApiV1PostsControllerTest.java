@@ -8,18 +8,22 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.transaction.annotation.Transactional;
+
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.matchesPattern;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Transactional
 @ActiveProfiles("test")
 public class ApiV1PostsControllerTest {
     @Autowired
     private MockMvc mockMvc;
-
+    private static final String DATE_PATTERN = "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.?\\d{0,7}";
     @Test
     @DisplayName("get /api/v1/posts")
     void t1() throws Exception{
@@ -35,6 +39,8 @@ public class ApiV1PostsControllerTest {
                 .andExpect(handler().methodName("getPosts"))
                 .andExpect(jsonPath("$.data.result[0].id", is(100)))
                 .andExpect(jsonPath("$.data.result[0].title", is("제목 100")))
+                .andExpect(jsonPath("$.data.result[0].createDate", matchesPattern(DATE_PATTERN)))
+                .andExpect(jsonPath("$.data.result[0].modifyDate", matchesPattern(DATE_PATTERN)))
                 .andDo(print());
     }
 
