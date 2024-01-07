@@ -64,5 +64,11 @@ public class PostService {
 
     }
 
+    public List<Post> findAll() {
+        return postRepository.findAll();
+    }
 
+    public List<Post> findAllByOrderByIdDesc() {
+        return postRepository.findAllByOrderByIdDesc();
+    }
 }

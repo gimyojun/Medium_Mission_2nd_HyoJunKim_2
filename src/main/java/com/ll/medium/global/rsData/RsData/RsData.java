@@ -11,9 +11,9 @@ import static lombok.AccessLevel.PRIVATE;
 @Getter
 public class RsData<T> {
     String resultCode;
-    int statusCode;
     String msg;
     T data;
+    int statusCode;
 
     public static <T> RsData<T> of(String resultCode, String msg) {
         return of(resultCode, msg, null);
@@ -21,8 +21,7 @@ public class RsData<T> {
 
     public static <T> RsData<T> of(String resultCode, String msg, T data) {
         int statusCode = Integer.parseInt(resultCode.split("-", 2)[0]);
-
-        return new RsData<>(resultCode, statusCode, msg, data);
+        return new RsData<>(resultCode, msg, data, statusCode);
     }
 
     public boolean isSuccess() {

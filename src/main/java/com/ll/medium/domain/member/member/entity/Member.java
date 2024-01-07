@@ -30,8 +30,9 @@ public class Member extends BaseEntity {
 
     private String nickname;
 
-
-
+    public String getName() {
+        return this.nickname != null ? this.nickname : this.username;
+    }
 
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> authorities = new ArrayList<>();

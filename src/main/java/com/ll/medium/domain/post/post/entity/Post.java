@@ -20,7 +20,7 @@ import static lombok.AccessLevel.PROTECTED;
 @ToString(callSuper = true)
 public class Post extends BaseEntity {
 
-
+    //fetch = lazy라는건 Member가 프록시라는 의미
     @ManyToOne(fetch = FetchType.LAZY)
     private Member author;
 
