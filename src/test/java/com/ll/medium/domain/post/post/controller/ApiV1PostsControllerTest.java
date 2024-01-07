@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -14,8 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -99,8 +99,39 @@ public class ApiV1PostsControllerTest {
         Post post = postService.findById(100L).orElse(null);
         assertThat(post).isNull();
 
+    }
+    @Test
+    @DisplayName("put /api/v1/posts/{id}")
+    void t4() throws Exception{
+        //given
 
+        //when
+        ResultActions resultActions = mockMvc
+                .perform(
+                        put("/api/v1/posts/99")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("""
+                                        {
+                                            "title": "수정 제목 99",
+                                            "body": "수정 내용 99"
+                                        }
+                                        """)
 
+                )
+                .andDo(print());
+        //then
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(handler().handlerType(ApiV1PostsController.class))
+                .andExpect(handler().methodName("updatePost"))
+                .andExpect(jsonPath("$.data.result.id", instanceOf(Number.class)))
+                .andExpect(jsonPath("$.data.result.title", is("수정 제목 99")))
+                .andExpect(jsonPath("$.data.result.body", is("수정 내용 99")))
+                .andExpect(jsonPath("$.data.result.authorId",instanceOf(Number.class)))
+                .andExpect(jsonPath("$.data.result.authorName", notNullValue()))
+                .andExpect(jsonPath("$.data.result.createDate", matchesPattern(DATE_PATTERN)))
+                .andExpect(jsonPath("$.data.result.modifyDate", matchesPattern(DATE_PATTERN)))
+                .andDo(print());
     }
 
 

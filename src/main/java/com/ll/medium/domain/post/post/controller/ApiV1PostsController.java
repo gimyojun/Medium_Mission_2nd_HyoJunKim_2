@@ -6,6 +6,7 @@ import com.ll.medium.domain.post.post.service.PostService;
 import com.ll.medium.global.rsData.RsData.RsData;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -56,8 +57,33 @@ public class ApiV1PostsController {
     @DeleteMapping("/{id}")
     public RsData<DeletePostResponseBody> deletePost(@PathVariable Long id){
         Post post = postService.findById(id).get();
-        postService.deleteById(id);
+        postService.deletePost(id);
 
         return RsData.of("200", "success", new DeletePostResponseBody(post));
     }
+    @Getter
+    @Setter
+    public static class UpdatePostRequestBody{
+        private String title;
+        private String body;
+    }
+
+    @Getter
+    public static class UpdatePostResponseBody{
+        private final PostDto result;
+        public UpdatePostResponseBody(Post post) {
+            result = new PostDto(post);
+        }
+    }
+    @PutMapping("/{id}")
+    public RsData<UpdatePostResponseBody> updatePost(@PathVariable Long id, @RequestBody UpdatePostRequestBody body){
+        Post post = postService.findById(id).get();
+        postService.updatePost(post, body.getTitle(), body.getBody());
+
+        return RsData.of("200", "success", new UpdatePostResponseBody(post));
+
+
+    }
+
+
 }

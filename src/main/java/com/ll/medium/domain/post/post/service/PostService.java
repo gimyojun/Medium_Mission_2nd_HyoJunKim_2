@@ -75,7 +75,15 @@ public class PostService {
     }
 
     @Transactional
-    public void deleteById(Long id) {
+    public void deletePost(Long id) {
         postRepository.deleteById(id);
+    }
+
+    @Transactional
+    public void updatePost(Post post, String title, String body) {
+        post.setTitle(title);
+        post.setBody(body);
+        //더티 체킹으로 생략 가능
+        //postRepository.save(post);
     }
 }
