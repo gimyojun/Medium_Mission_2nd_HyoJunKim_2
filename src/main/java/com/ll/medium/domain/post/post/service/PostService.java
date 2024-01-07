@@ -7,16 +7,18 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class PostService {
     private final PostRepository postRepository;
 
-
+    @Transactional
     public void write(Member author, String title, String body, boolean isPublished, boolean isPaid) {
         Post post = Post.builder()
                 .author(author)
@@ -70,5 +72,10 @@ public class PostService {
 
     public List<Post> findAllByOrderByIdDesc() {
         return postRepository.findAllByOrderByIdDesc();
+    }
+
+    @Transactional
+    public void deleteById(Long id) {
+        postRepository.deleteById(id);
     }
 }

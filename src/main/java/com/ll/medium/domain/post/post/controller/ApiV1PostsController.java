@@ -6,10 +6,7 @@ import com.ll.medium.domain.post.post.service.PostService;
 import com.ll.medium.global.rsData.RsData.RsData;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -47,5 +44,20 @@ public class ApiV1PostsController {
     @GetMapping("/{id}")
     public RsData<GetPostResponseBody> getPost(@PathVariable Long id){
         return RsData.of("200", "success", new GetPostResponseBody(postService.findById(id).get()));
+    }
+
+    @Getter
+    public static class DeletePostResponseBody{
+        private final PostDto result;
+        public DeletePostResponseBody(Post post) {
+            result = new PostDto(post);
+        }
+    }
+    @DeleteMapping("/{id}")
+    public RsData<DeletePostResponseBody> deletePost(@PathVariable Long id){
+        Post post = postService.findById(id).get();
+        postService.deleteById(id);
+
+        return RsData.of("200", "success", new DeletePostResponseBody(post));
     }
 }
