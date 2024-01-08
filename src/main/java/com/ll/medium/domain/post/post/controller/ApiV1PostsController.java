@@ -12,8 +12,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 //메서드에 @ResponsBody자동으로 붙는다
 @RestController
@@ -106,12 +108,25 @@ public class ApiV1PostsController {
         }
     }
     @PostMapping("")
-    public RsData<WritePostResponseBody> writePost(@RequestBody WritePostRequestBody body){
+    public RsData<WritePostResponseBody> writePost(
+            @RequestBody WritePostRequestBody body,
+            Principal principal
+
+
+    ){
         Member member = rq.getLoginedMember();
         //임시 TODO 로그인 안된경우 writePost를 못하게 막아야함. 지금 임시로 3번 member 할당함
         if(member == null){
             member = memberService.findById(3L).get();
         }
+        Optional.ofNullable(principal).ifPresentOrElse(
+                p -> {
+                    System.out.println("로그인됨" + p.getName());
+                },
+                () -> {
+                    System.out.println("로그인 안됨");
+                }
+        );
 
         RsData<Post> rsData= postService.writePost(member, body.getTitle(), body.getBody());
 
