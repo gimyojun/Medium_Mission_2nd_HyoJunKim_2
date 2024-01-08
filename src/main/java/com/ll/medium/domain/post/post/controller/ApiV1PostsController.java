@@ -115,12 +115,8 @@ public class ApiV1PostsController {
 
         RsData<Post> rsData= postService.writePost(member, body.getTitle(), body.getBody());
 
-        return RsData.of(
-                rsData.getResultCode(),
-                rsData.getMsg(),
+        return rsData.of(
                 new WritePostResponseBody(rsData.getData())
-
-
         );
     }
 
