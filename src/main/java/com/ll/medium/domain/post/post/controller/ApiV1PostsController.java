@@ -1,8 +1,11 @@
 package com.ll.medium.domain.post.post.controller;
 
+import com.ll.medium.domain.member.member.entity.Member;
+import com.ll.medium.domain.member.member.service.MemberService;
 import com.ll.medium.domain.post.post.dto.PostDto;
 import com.ll.medium.domain.post.post.entity.Post;
 import com.ll.medium.domain.post.post.service.PostService;
+import com.ll.medium.global.rq.Rq.Rq;
 import com.ll.medium.global.rsData.RsData.RsData;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +21,8 @@ import java.util.Map;
 @RequestMapping("/api/v1/posts")
 public class ApiV1PostsController {
     private final PostService postService;
+    private final Rq rq;
+    private final MemberService memberService;
     @Getter
     public static class GetPostsResponseBody{
         private final List<PostDto> result;
@@ -81,8 +86,32 @@ public class ApiV1PostsController {
         postService.updatePost(post, body.getTitle(), body.getBody());
 
         return RsData.of("200", "success", new UpdatePostResponseBody(post));
+    }
+    @Getter
+    @Setter
+    public static class WritePostRequestBody{
+        private String title;
+        private String body;
+    }
 
+    @Getter
+    public static class WritePostResponseBody{
+        private final PostDto result;
+        public WritePostResponseBody(Post post) {
+            result = new PostDto(post);
+        }
+    }
+    @PostMapping("")
+    public RsData<WritePostResponseBody> writePost(@RequestBody WritePostRequestBody body){
+        Member member = rq.getLoginedMember();
+        //임시 TODO 로그인 안된경우 writePost를 못하게 막아야함. 지금 임시로 3번 member 할당함
+        if(member == null){
+            member = memberService.findById(3L).get();
+        }
 
+        Post post = postService.writePost(member, body.getTitle(), body.getBody()).getData();
+
+        return RsData.of("200", "success", new WritePostResponseBody(post));
     }
 
 

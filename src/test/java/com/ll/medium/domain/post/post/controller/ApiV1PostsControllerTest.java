@@ -134,5 +134,38 @@ public class ApiV1PostsControllerTest {
                 .andDo(print());
     }
 
+    @Test
+    @DisplayName("post /api/v1/posts")
+    void t5() throws Exception{
+        //given
+
+        //when
+        ResultActions resultActions = mockMvc
+                .perform(
+                        post("/api/v1/posts")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("""
+                                        {
+                                            "title": "new 제목",
+                                            "body": "new 내용"
+                                        }
+                                        """)
+
+                )
+                .andDo(print());
+        //then
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(handler().handlerType(ApiV1PostsController.class))
+                .andExpect(handler().methodName("writePost"))
+                .andExpect(jsonPath("$.data.result.id", instanceOf(Number.class)))
+                .andExpect(jsonPath("$.data.result.title", is("new 제목")))
+                .andExpect(jsonPath("$.data.result.body", is("new 내용")))
+                .andExpect(jsonPath("$.data.result.authorId",instanceOf(Number.class)))
+                .andExpect(jsonPath("$.data.result.authorName", notNullValue()))
+                .andExpect(jsonPath("$.data.result.createDate", matchesPattern(DATE_PATTERN)))
+                .andExpect(jsonPath("$.data.result.modifyDate", matchesPattern(DATE_PATTERN)))
+                .andDo(print());
+    }
 
 }

@@ -3,6 +3,7 @@ package com.ll.medium.domain.post.post.service;
 import com.ll.medium.domain.member.member.entity.Member;
 import com.ll.medium.domain.post.post.entity.Post;
 import com.ll.medium.domain.post.post.repository.PostRepository;
+import com.ll.medium.global.rsData.RsData.RsData;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,7 +20,7 @@ public class PostService {
     private final PostRepository postRepository;
 
     @Transactional
-    public void write(Member author, String title, String body, boolean isPublished, boolean isPaid) {
+    public RsData<Post> write(Member author, String title, String body, boolean isPublished, boolean isPaid) {
         Post post = Post.builder()
                 .author(author)
                 .title(title)
@@ -31,6 +32,7 @@ public class PostService {
                 .build();
 
         postRepository.save(post);
+        return RsData.of("200","%d번 게시글이 작성되었습니다.".formatted(post.getId()), post);
     }
 
     public Object findTop30ByIsPublishedOrderByIdDesc(boolean isPublished) {
@@ -85,5 +87,21 @@ public class PostService {
         post.setBody(body);
         //더티 체킹으로 생략 가능
         //postRepository.save(post);
+    }
+
+    @Transactional
+    public RsData<Post> writePost(Member member, String title, String body) {
+        Post post = Post.builder()
+                .author(member)
+                .title(title)
+                .body(body)
+                .isPublished(true)
+                .isPaid(false)
+                .hitCount(0L)
+                .likeCount(0L)
+                .build();
+
+        postRepository.save(post);
+        return RsData.of("200","%d번 게시글이 작성되었습니다.".formatted(post.getId()), post);
     }
 }
