@@ -77,16 +77,21 @@ public class PostService {
     }
 
     @Transactional
-    public void deletePost(Long id) {
+    public RsData<Post> deletePost(long id) {
+        Post post = postRepository.findById(id).get();
         postRepository.deleteById(id);
+
+        return RsData.of("200","%d번 게시글이 삭제 되었습니다.".formatted(id), post);
+
     }
 
     @Transactional
-    public void updatePost(Post post, String title, String body) {
+    public RsData<Post> updatePost(Post post, String title, String body) {
         post.setTitle(title);
         post.setBody(body);
         //더티 체킹으로 생략 가능
         //postRepository.save(post);
+        return RsData.of("200","%d번 게시글이 수정 되었습니다.".formatted(post.getId()), post);
     }
 
     @Transactional

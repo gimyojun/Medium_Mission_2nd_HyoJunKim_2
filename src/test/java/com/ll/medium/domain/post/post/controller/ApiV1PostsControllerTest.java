@@ -80,7 +80,7 @@ public class ApiV1PostsControllerTest {
         //given
 
         //when
-        ResultActions resultActions = mockMvc.perform(delete("/api/v1/posts/100"))
+        ResultActions resultActions = mockMvc.perform(delete("/api/v1/posts/89"))
                 .andDo(print());
         //then
         resultActions
@@ -96,7 +96,7 @@ public class ApiV1PostsControllerTest {
                 .andExpect(jsonPath("$.data.result.modifyDate", matchesPattern(DATE_PATTERN)))
                 .andDo(print());
 
-        Post post = postService.findById(100L).orElse(null);
+        Post post = postService.findById(89L).orElse(null);
         assertThat(post).isNull();
 
     }

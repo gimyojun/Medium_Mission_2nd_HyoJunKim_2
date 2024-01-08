@@ -61,10 +61,14 @@ public class ApiV1PostsController {
     }
     @DeleteMapping("/{id}")
     public RsData<DeletePostResponseBody> deletePost(@PathVariable Long id){
-        Post post = postService.findById(id).get();
-        postService.deletePost(id);
-
-        return RsData.of("200", "success", new DeletePostResponseBody(post));
+        RsData<Post> rsData = postService.deletePost(id);
+        return RsData.of(
+                rsData.getResultCode(),
+                rsData.getMsg(),
+                new DeletePostResponseBody(
+                        rsData.getData()
+                )
+        );
     }
     @Getter
     @Setter
@@ -83,9 +87,9 @@ public class ApiV1PostsController {
     @PutMapping("/{id}")
     public RsData<UpdatePostResponseBody> updatePost(@PathVariable Long id, @RequestBody UpdatePostRequestBody body){
         Post post = postService.findById(id).get();
-        postService.updatePost(post, body.getTitle(), body.getBody());
+        RsData<Post> rsData = postService.updatePost(post, body.getTitle(), body.getBody());
 
-        return RsData.of("200", "success", new UpdatePostResponseBody(post));
+        return RsData.of(rsData.getResultCode(), rsData.getMsg(), new UpdatePostResponseBody(rsData.getData()));
     }
     @Getter
     @Setter
@@ -109,9 +113,15 @@ public class ApiV1PostsController {
             member = memberService.findById(3L).get();
         }
 
-        Post post = postService.writePost(member, body.getTitle(), body.getBody()).getData();
+        RsData<Post> rsData= postService.writePost(member, body.getTitle(), body.getBody());
 
-        return RsData.of("200", "success", new WritePostResponseBody(post));
+        return RsData.of(
+                rsData.getResultCode(),
+                rsData.getMsg(),
+                new WritePostResponseBody(rsData.getData())
+
+
+        );
     }
 
 
