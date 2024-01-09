@@ -44,4 +44,9 @@ public class MemberService {
     public Optional<Member> findById(Long l) {
         return memberRepository.findById(l);
     }
+
+    public Optional<Member> findByApiKey(String apiKey) {
+        return memberRepository.findByApiKey(apiKey);
+
+    }
 }
