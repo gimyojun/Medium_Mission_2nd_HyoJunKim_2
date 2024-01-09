@@ -114,10 +114,10 @@ public class ApiV1PostsController {
 
 
     ){
-        Member member = rq.getLoginedMember();
-        //임시 TODO 로그인 안된경우 writePost를 못하게 막아야함. 지금 임시로 3번 member 할당함
+        Member member = rq.getCustomLoginedMember();
+
         if(member == null){
-            member = memberService.findById(3L).get();
+            throw new RuntimeException("로그인이 필요합니다. 로그인 후 다시 시도해주세요.");
         }
         Optional.ofNullable(principal).ifPresentOrElse(
                 p -> {

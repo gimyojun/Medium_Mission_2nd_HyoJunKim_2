@@ -18,8 +18,10 @@ import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
+// 스프링 컨텍스트(빈)을 로드해서 사용하기 위해서 필요하다.
 @SpringBootTest
+// MockMvc를 사용하기 위해서 필요하다.
+// MockMvc는 실제 웹 서버를 시작하지 않고도 스프링 MVC 컨트롤러를 테스트할 수 있게 해주는 클래스
 @AutoConfigureMockMvc
 @Transactional //롤백됨, 롤백 안하려면 테스트 메서드에 @Rollback(false)붙이기
 @ActiveProfiles("test")

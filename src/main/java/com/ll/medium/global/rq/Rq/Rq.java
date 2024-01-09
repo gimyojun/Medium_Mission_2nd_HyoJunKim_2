@@ -118,4 +118,16 @@ public class Rq {
         Member member = memberService.findByUsername(this.getCurrentUser().getUsername()).get();
         return member;
     }
+
+    public Member getCustomLoginedMember(){
+
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        user.getUsername();
+
+        Member member = memberService.findByUsername(user.getUsername()).get();
+        if (member == null)
+            return null;
+
+        return member;
+    }
 }
