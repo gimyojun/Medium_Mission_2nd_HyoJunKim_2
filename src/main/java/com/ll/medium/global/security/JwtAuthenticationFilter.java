@@ -26,8 +26,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @SneakyThrows
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) {
         System.out.println("JwtAuthenticationFilter 실행");
-        String username = request.getParameter("username");
-        String password = request.getParameter("password");
+        String username = request.getHeader("username");
+        String password = request.getHeader("password");
         if(username != null && password != null){
             Member member = memberService.findByUsername(username).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
             if(!passwordEncoder.matches(password, member.getPassword())){
