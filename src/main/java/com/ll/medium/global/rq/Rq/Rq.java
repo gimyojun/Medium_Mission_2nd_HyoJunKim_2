@@ -122,8 +122,6 @@ public class Rq {
     public Member getCustomLoginedMember(){
 
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        user.getUsername();
-
         Member member = memberService.findByUsername(user.getUsername()).get();
         if (member == null)
             return null;
