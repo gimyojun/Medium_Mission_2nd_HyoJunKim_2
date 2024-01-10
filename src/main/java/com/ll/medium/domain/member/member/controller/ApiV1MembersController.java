@@ -8,7 +8,6 @@ import com.ll.medium.global.rsData.RsData.RsData;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -44,15 +43,6 @@ public class ApiV1MembersController {
 
         // return new RsData<LoginResponseBody>
         return rsData.of(new LoginResponseBody(rsData.getData()));
-    }
-    @PreAuthorize("isAuthenticated()")
-    @PostMapping("/regenApikey")
-    public RsData<?> regenApikey() {
-
-        Member member = rq.getCustomLoginedMember();
-        memberService.regenApikey(member);
-
-        return RsData.of("200", "apiKey가 재발급되었습니다");
     }
 
 }

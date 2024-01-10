@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -47,8 +46,7 @@ public class MemberService {
     }
 
     public Optional<Member> findByApiKey(String apiKey) {
-        return memberRepository.findByApiKey(apiKey);
-
+        return null;
     }
 
     public RsData<Member> checkUsernameAndPassword(String username, String password) {
@@ -64,12 +62,5 @@ public class MemberService {
         }else {
             return RsData.of("400-2", "존재하지 않는 회원입니다.");
         }
-    }
-
-    @Transactional
-    public void regenApikey(Member member) {
-        //더티체킹
-        member.setApiKey(UUID.randomUUID().toString());
-
     }
 }
