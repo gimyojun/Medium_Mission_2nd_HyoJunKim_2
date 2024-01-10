@@ -6,10 +6,14 @@ import com.ll.medium.global.rsData.RsData.RsData;
 import com.ll.medium.global.util.jwt.JwtUtil;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -48,15 +52,6 @@ public class MemberService {
         return memberRepository.findById(l);
     }
 
-    public Optional<Member> findByApiKey(String apiKey) {
-        Claims claims = JwtUtil.decode(apiKey);
-
-        Map<String, String> data = (Map) claims.get("id");
-        long id = Long.parseLong(data.get("id"));
-        return findById(id);
-
-    }
-
     public RsData<Member> checkUsernameAndPassword(String username, String password) {
 
         Optional<Member> op = memberRepository.findByUsername(username);
@@ -71,4 +66,22 @@ public class MemberService {
             return RsData.of("400-2", "존재하지 않는 회원입니다.");
         }
     }
+
+    //쿼리 하나줄임.
+    public User getUserFromApiKey(String apiKey) {
+        Claims claims = JwtUtil.decode(apiKey);
+
+        Map<String, Object> data = (Map<String, Object>) claims.get("data");
+        String id = (String) data.get("id");
+
+        List<? extends GrantedAuthority> authorities = ((List<?>) data.get("authorities"))
+                .stream()
+                .map(String::valueOf) // Convert each element to String
+                .map(SimpleGrantedAuthority::new)
+                .toList();
+
+        return new User(id, "", authorities);
+
+    }
+
 }

@@ -1,6 +1,5 @@
 package com.ll.medium.global.security;
 
-import com.ll.medium.domain.member.member.entity.Member;
 import com.ll.medium.domain.member.member.service.MemberService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,8 +12,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-
-import java.util.Collections;
 
 @Component
 @RequiredArgsConstructor
@@ -29,13 +26,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String apiKey = request.getHeader("X-ApiKey");
 
         if(apiKey != null){
-            memberService.findByApiKey(apiKey).ifPresentOrElse(this::processMemberAuthentication, this::handleMemberNotFound);
+            User user = memberService.getUserFromApiKey(apiKey);
+            processUserAuthentication(user);
         }
         filterChain.doFilter(request, response);
     }
-    private void processMemberAuthentication(Member member) {
-        User user = new User(member.getUsername(), member.getPassword(), Collections.emptyList());
-
+    private void processUserAuthentication(User user) {
         Authentication auth = new UsernamePasswordAuthenticationToken(
                 user,
                 user.getPassword(),
@@ -44,9 +40,4 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // 스프링 시큐리티 세션에 해당 객체 저장해서 로그인 처리
         SecurityContextHolder.getContext().setAuthentication(auth);
     }
-
-    private void handleMemberNotFound() {
-        throw new IllegalArgumentException("존재하지 않는 회원입니다.");
-    }
-
 }

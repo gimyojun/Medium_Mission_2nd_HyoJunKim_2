@@ -13,8 +13,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Map;
+
+import static java.util.stream.Collectors.toList;
 
 @RestController
 @RequestMapping("/api/v1/members")
@@ -47,7 +50,12 @@ public class ApiV1MembersController {
         RsData<Member> rsData = memberService.checkUsernameAndPassword(requestBody.getUsername(), requestBody.getPassword());
         Member member = rsData.getData();
         Long id = member.getId();
-        String accessToken = JwtUtil.encode(Map.of("id", id.toString()));
+        String accessToken = JwtUtil.encode(
+                Map.of(
+                        "id", id.toString(),
+                        "authorities", member.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(toList())
+                )
+        );
         // return new RsData<LoginResponseBody>
         return rsData.of(new LoginResponseBody(member, accessToken));
     }
