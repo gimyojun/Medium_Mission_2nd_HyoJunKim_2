@@ -120,12 +120,15 @@ public class Rq {
     }
 
     public Member getCustomLoginedMember(){
-
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Member member = memberService.findByUsername(user.getUsername()).get();
-        if (member == null)
-            return null;
-
-        return member;
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof User) {
+            User user = (User) authentication.getPrincipal();
+            Member member = memberService.findByUsername(user.getUsername()).get();
+            if (member == null)
+                return null;
+            return member;
+        } else {
+            throw new RuntimeException("rq : 로그인이 필요합니다. 로그인 후 다시 시도해주세요.");
+        }
     }
 }

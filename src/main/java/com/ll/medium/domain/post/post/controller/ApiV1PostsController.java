@@ -111,8 +111,6 @@ public class ApiV1PostsController {
     public RsData<WritePostResponseBody> writePost(
             @RequestBody WritePostRequestBody body,
             Principal principal
-
-
     ){
         Member member = rq.getCustomLoginedMember();
 

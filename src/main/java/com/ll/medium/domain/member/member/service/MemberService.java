@@ -49,4 +49,19 @@ public class MemberService {
         return memberRepository.findByApiKey(apiKey);
 
     }
+
+    public RsData<Member> checkUsernameAndPassword(String username, String password) {
+
+        Optional<Member> op = memberRepository.findByUsername(username);
+        if (op.isPresent()) {
+            Member member = op.get();
+            if (passwordEncoder.matches(password, member.getPassword())) {
+                return RsData.of("200", "success", member);
+            }else {
+                return RsData.of("400-1", "비밀번호가 일치하지 않습니다.");
+            }
+        }else {
+            return RsData.of("400-2", "존재하지 않는 회원입니다.");
+        }
+    }
 }
