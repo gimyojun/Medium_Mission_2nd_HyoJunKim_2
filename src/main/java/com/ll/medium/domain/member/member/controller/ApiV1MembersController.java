@@ -5,6 +5,7 @@ import com.ll.medium.domain.member.member.entity.Member;
 import com.ll.medium.domain.member.member.service.MemberService;
 import com.ll.medium.global.rq.Rq.Rq;
 import com.ll.medium.global.rsData.RsData.RsData;
+import com.ll.medium.global.util.jwt.JwtUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -12,6 +13,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/members")
@@ -30,9 +33,11 @@ public class ApiV1MembersController {
     @Getter
     public static class LoginResponseBody {
         private final MemberDto result;
+        private final String accesToken;
 
-        public LoginResponseBody(Member member) {
+        public LoginResponseBody(Member member, String accesToken) {
             result = new MemberDto(member);
+            this.accesToken = accesToken;
         }
 
     }
@@ -40,9 +45,11 @@ public class ApiV1MembersController {
     @PostMapping("/login")
     public RsData<LoginResponseBody> login(@RequestBody LoginRequestBody requestBody) {
         RsData<Member> rsData = memberService.checkUsernameAndPassword(requestBody.getUsername(), requestBody.getPassword());
-
+        Member member = rsData.getData();
+        Long id = member.getId();
+        String accessToken = JwtUtil.encode(Map.of("id", id.toString()));
         // return new RsData<LoginResponseBody>
-        return rsData.of(new LoginResponseBody(rsData.getData()));
+        return rsData.of(new LoginResponseBody(member, accessToken));
     }
 
 }
