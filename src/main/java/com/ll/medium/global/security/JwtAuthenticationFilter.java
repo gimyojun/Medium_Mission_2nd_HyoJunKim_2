@@ -25,6 +25,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @SneakyThrows
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) {
         System.out.println("JwtAuthenticationFilter 실행");
+        // X 붙여주는게 관례다.
         String apiKey = request.getHeader("X-ApiKey");
 
         if(apiKey != null){
