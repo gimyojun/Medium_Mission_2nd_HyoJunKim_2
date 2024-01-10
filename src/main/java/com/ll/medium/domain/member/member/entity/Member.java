@@ -33,7 +33,7 @@ public class Member extends BaseEntity {
     private String nickname;
 
     @Column(unique = true)
-    @UuidGenerator(style = UuidGenerator.Style.TIME)
+    @UuidGenerator(style = UuidGenerator.Style.RANDOM)
     private String apiKey;
 
     public String getName() {
