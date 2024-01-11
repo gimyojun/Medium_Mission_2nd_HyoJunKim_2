@@ -2,7 +2,7 @@ package com.ll.medium.global.rq.Rq;
 
 import com.ll.medium.domain.member.member.entity.Member;
 import com.ll.medium.domain.member.member.service.MemberService;
-import com.ll.medium.global.auth.CustomUserDetails;
+import com.ll.medium.global.auth.CustomUser;
 import com.ll.medium.global.rsData.RsData.RsData;
 import com.ll.medium.standard.util.Ut.Ut;
 import jakarta.servlet.http.HttpServletRequest;
@@ -54,7 +54,7 @@ public class Rq {
 
         return redirect(path, rs.getMsg());
     }
-
+    //TODO 사용하지 않을 메서드. usages확인하고 메서드 대체되면 삭제요망
     public User getUser() {
         return Optional.ofNullable(SecurityContextHolder.getContext())
                 .map(SecurityContext::getAuthentication)
@@ -63,11 +63,11 @@ public class Rq {
                 .map(it -> (User) it)
                 .orElse(null);
     }
-    public CustomUserDetails getCurrentUser() {
+    public CustomUser getCurrentUser() {
         return Optional.ofNullable(SecurityContextHolder.getContext())
                 .map(SecurityContext::getAuthentication)
-                .filter(authentication -> authentication.getPrincipal() instanceof CustomUserDetails)
-                .map(authentication -> (CustomUserDetails) authentication.getPrincipal())
+                .filter(authentication -> authentication.getPrincipal() instanceof CustomUser)
+                .map(authentication -> (CustomUser) authentication.getPrincipal())
                 .orElse(null);
     }
 
@@ -79,6 +79,7 @@ public class Rq {
         return !isLogin();
     }
 
+    //TODO getCurrentUser()를 통해 현재 로그인된 멤버가 관리자임을 확인
     public boolean isAdmin() {
         if (isLogout()) return false;
 
@@ -87,6 +88,7 @@ public class Rq {
                 .stream()
                 .anyMatch(it -> it.getAuthority().equals("ROLE_ADMIN"));
     }
+    // TODO 대체 메서드 만들어야함.
     public boolean isPaid() {
         if(isLogout())return false;
         return getUser()
@@ -120,9 +122,11 @@ public class Rq {
     }
 
     public Member getCustomLoginedMember(){
+        if (isLogout())
+            throw new RuntimeException("rq1 : 로그인이 필요합니다. 로그인 후 다시 시도해주세요.");
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.getPrincipal() instanceof User) {
-            User user = (User) authentication.getPrincipal();
+        if (authentication != null && authentication.getPrincipal() instanceof CustomUser) {
+            CustomUser user = (CustomUser) authentication.getPrincipal();
             Member member = memberService.findByUsername(user.getUsername()).get();
             if (member == null)
                 return null;

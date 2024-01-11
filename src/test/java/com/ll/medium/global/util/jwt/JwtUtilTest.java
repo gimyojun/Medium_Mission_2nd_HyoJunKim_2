@@ -11,7 +11,7 @@ public class JwtUtilTest {
     @Test
     @DisplayName("t1")
     void t1() {
-        Map<String, String> map = Map.of(
+        Map<String, Object> map = Map.of(
                 "name", "김효준",
                 "age", "30"
         );

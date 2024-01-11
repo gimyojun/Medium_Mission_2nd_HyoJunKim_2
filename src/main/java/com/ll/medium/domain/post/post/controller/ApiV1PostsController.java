@@ -10,12 +10,11 @@ import com.ll.medium.global.rsData.RsData.RsData;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 //메서드에 @ResponsBody자동으로 붙는다
 @RestController
@@ -107,25 +106,10 @@ public class ApiV1PostsController {
             result = new PostDto(post);
         }
     }
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("")
-    public RsData<WritePostResponseBody> writePost(
-            @RequestBody WritePostRequestBody body,
-            Principal principal
-    ){
+    public RsData<WritePostResponseBody> writePost(@RequestBody WritePostRequestBody body){
         Member member = rq.getCustomLoginedMember();
-
-        if(member == null){
-            throw new RuntimeException("로그인이 필요합니다. 로그인 후 다시 시도해주세요.");
-        }
-        Optional.ofNullable(principal).ifPresentOrElse(
-                p -> {
-                    System.out.println("로그인됨" + p.getName());
-                },
-                () -> {
-                    System.out.println("로그인 안됨");
-                }
-        );
-
         RsData<Post> rsData= postService.writePost(member, body.getTitle(), body.getBody());
 
         return rsData.of(

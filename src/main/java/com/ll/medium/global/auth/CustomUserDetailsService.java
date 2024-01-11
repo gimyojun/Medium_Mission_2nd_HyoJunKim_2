@@ -28,13 +28,13 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         Member member = opMember.get();
 
-        //CustomUserDetails객체로 회원가입 회원과 소셜회원 로그인 통합
-        return new CustomUserDetails(member);
-//        return new User(
-//                member.getUsername(),
-//                member.getPassword(),
-//                member.getAuthorities()
-//        );
+        //CustomUser 객체로 회원가입 회원과 소셜회원 로그인 통합
+        return new CustomUser(
+                member.getId(),
+                member.getUsername(),
+                member.getPassword(),
+                member.getAuthorities()
+        );
 
     }
 }

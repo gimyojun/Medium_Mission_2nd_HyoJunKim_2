@@ -1,6 +1,7 @@
 package com.ll.medium.global.security;
 
 import com.ll.medium.domain.member.member.service.MemberService;
+import com.ll.medium.global.auth.CustomUser;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -9,7 +10,6 @@ import lombok.SneakyThrows;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -26,12 +26,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String apiKey = request.getHeader("X-ApiKey");
 
         if(apiKey != null){
-            User user = memberService.getUserFromApiKey(apiKey);
+            CustomUser user = memberService.getUserFromApiKey(apiKey);
             processUserAuthentication(user);
         }
         filterChain.doFilter(request, response);
     }
-    private void processUserAuthentication(User user) {
+    private void processUserAuthentication(CustomUser user) {
         Authentication auth = new UsernamePasswordAuthenticationToken(
                 user,
                 user.getPassword(),

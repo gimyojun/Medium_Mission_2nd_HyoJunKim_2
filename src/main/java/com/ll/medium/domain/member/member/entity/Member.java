@@ -34,7 +34,7 @@ public class Member extends BaseEntity {
     public String getName() {
         return this.nickname != null ? this.nickname : this.username;
     }
-
+    @SuppressWarnings("JpaAttributeTypeInspection")
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> authorities = new ArrayList<>();
 
