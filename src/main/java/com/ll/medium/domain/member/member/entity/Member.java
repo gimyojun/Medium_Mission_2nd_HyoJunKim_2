@@ -21,14 +21,13 @@ import static lombok.AccessLevel.PROTECTED;
 @Setter
 @ToString(callSuper = true)
 public class Member extends BaseEntity {
-
     private String username;
-
     private String password;
-
     private boolean isPaid;
-
     private String nickname;
+    private String refreshToken;
+
+
 
 
     public String getName() {

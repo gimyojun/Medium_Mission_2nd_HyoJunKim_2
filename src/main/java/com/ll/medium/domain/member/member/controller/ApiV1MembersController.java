@@ -37,10 +37,12 @@ public class ApiV1MembersController {
     public static class LoginResponseBody {
         private final MemberDto result;
         private final String accesToken;
+        private final String refreshToken;
 
-        public LoginResponseBody(Member member, String accesToken) {
+        public LoginResponseBody(Member member, String accesToken, String refreshToken) {
             result = new MemberDto(member);
             this.accesToken = accesToken;
+            this.refreshToken = refreshToken;
         }
 
     }
@@ -56,10 +58,20 @@ public class ApiV1MembersController {
                         "username", member.getUsername(),
                         "authorities", member.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(toList())
                 ),
-                (long)1000 * 60 * 60 * 24 * 365
+                (long) 1000 * 60 * 10
         );
+        String refreshToken = JwtUtil.encode(
+                Map.of(
+                        "id", id.toString(),
+                        "username", member.getUsername()
+
+                ),
+                (long) 1000 * 60 * 60 * 24 * 365
+        );
+
+        memberService.setRefreshToken(member, refreshToken);
         // return new RsData<LoginResponseBody>
-        return rsData.of(new LoginResponseBody(member, accessToken));
+        return rsData.of(new LoginResponseBody(member, accessToken, refreshToken));
     }
 
 }

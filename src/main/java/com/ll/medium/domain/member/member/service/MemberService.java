@@ -85,5 +85,8 @@ public class MemberService {
         return new CustomUser(id, username,"", authorities);
 
     }
-
+    @Transactional
+    public void setRefreshToken(Member member, String refreshToken) {
+        member.setRefreshToken(refreshToken);
+    }
 }
