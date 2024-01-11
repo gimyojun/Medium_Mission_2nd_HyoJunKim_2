@@ -9,10 +9,10 @@ import jakarta.persistence.EntityManager;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
@@ -30,6 +30,7 @@ public class Rq {
     private final MemberService memberService;
     private Member member;
     private final EntityManager entityManager;
+    private CustomUser customUser;
 
 
     public String redirect(String url, String msg) {
@@ -58,47 +59,24 @@ public class Rq {
 
         return redirect(path, rs.getMsg());
     }
-    //TODO 사용하지 않을 메서드. usages확인하고 메서드 대체되면 삭제요망
-    public User getUser() {
-        return Optional.ofNullable(SecurityContextHolder.getContext())
-                .map(SecurityContext::getAuthentication)
-                .map(Authentication::getPrincipal)
-                .filter(it -> it instanceof User)
-                .map(it -> (User) it)
-                .orElse(null);
-    }
-    public CustomUser getCurrentUser() {
-        return Optional.ofNullable(SecurityContextHolder.getContext())
-                .map(SecurityContext::getAuthentication)
-                .filter(authentication -> authentication.getPrincipal() instanceof CustomUser)
-                .map(authentication -> (CustomUser) authentication.getPrincipal())
-                .orElse(null);
+
+    public CustomUser getCustomUser() {
+        if (customUser == null) {
+            customUser = Optional.ofNullable(SecurityContextHolder.getContext())
+                    .map(SecurityContext::getAuthentication)
+                    .filter(authentication -> authentication.getPrincipal() instanceof CustomUser)
+                    .map(authentication -> (CustomUser) authentication.getPrincipal())
+                    .orElse(null);
+        }
+        return customUser;
     }
 
     public boolean isLogin() {
-        return getCurrentUser() != null;
+        return getCustomUser() != null;
     }
 
     public boolean isLogout() {
         return !isLogin();
-    }
-
-    //TODO getCurrentUser()를 통해 현재 로그인된 멤버가 관리자임을 확인
-    public boolean isAdmin() {
-        if (isLogout()) return false;
-
-        return getUser()
-                .getAuthorities()
-                .stream()
-                .anyMatch(it -> it.getAuthority().equals("ROLE_ADMIN"));
-    }
-    // TODO 대체 메서드 만들어야함.
-    public boolean isPaid() {
-        if(isLogout())return false;
-        return getUser()
-                .getAuthorities()
-                .stream()
-                .anyMatch(it -> it.getAuthority().equals("ROLE_PAID"));
     }
 
     public void setAttribute(String key, Object value) {
@@ -121,19 +99,51 @@ public class Rq {
     public Member getLoginedMember(){
         if (isLogout())
             return null;
-        Member member = memberService.findByUsername(this.getCurrentUser().getUsername()).get();
+        Member member = memberService.findByUsername(this.getCustomUser().getUsername()).get();
         return member;
     }
 
     public Member getAuthenticatedMemberFromSecurityContext(){
         if (isLogout())
-            throw new RuntimeException("rq1 : 로그인이 필요합니다. 로그인 후 다시 시도해주세요.");
-        if(member == null){
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            CustomUser user = (CustomUser) authentication.getPrincipal();
-            long memberId = user.getId();
-            member = entityManager.getReference(Member.class, memberId);
-        }
+            throw new RuntimeException("rq : 로그인이 필요합니다. 로그인 후 다시 시도해주세요.");
+        if(member == null)
+            member = entityManager.getReference(Member.class, getCustomUser().getId());
         return member;
+    }
+    public boolean isAdmin(){
+        if(isLogout())
+            return false;
+        return getCustomUser()
+                .getAuthorities()
+                .stream()
+                .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
+    }
+    public boolean isPaid(){
+        if(isLogout())
+            return false;
+        return getCustomUser()
+                .getAuthorities()
+                .stream()
+                .anyMatch(it -> it.getAuthority().equals("ROLE_PAID"));
+    }
+
+    public void setAuthentication(CustomUser user) {
+        Authentication auth = new UsernamePasswordAuthenticationToken(
+                user,
+                user.getPassword(),
+                user.getAuthorities()
+        );
+        // 스프링 시큐리티 세션에 해당 객체 저장해서 로그인 처리
+        SecurityContextHolder.getContext().setAuthentication(auth);
+    }
+
+    public String getHeader(String name, String defaultValue) {
+        String value = request.getHeader(name);
+
+        if (value == null) {
+            return defaultValue;
+        }
+
+        return value;
     }
 }
