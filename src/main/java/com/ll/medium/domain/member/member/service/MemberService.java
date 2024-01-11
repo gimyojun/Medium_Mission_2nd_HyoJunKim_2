@@ -2,13 +2,13 @@ package com.ll.medium.domain.member.member.service;
 
 import com.ll.medium.domain.member.member.entity.Member;
 import com.ll.medium.domain.member.member.repository.MemberRepository;
+import com.ll.medium.global.auth.CustomUser;
 import com.ll.medium.global.rsData.RsData.RsData;
 import com.ll.medium.global.util.jwt.JwtUtil;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -68,11 +68,13 @@ public class MemberService {
     }
 
     //쿼리 하나줄임.
-    public User getUserFromApiKey(String apiKey) {
+    public CustomUser getUserFromApiKey(String apiKey) {
         Claims claims = JwtUtil.decode(apiKey);
 
         Map<String, Object> data = (Map<String, Object>) claims.get("data");
-        String id = (String) data.get("id");
+        long id = Long.parseLong((String) data.get("id"));
+
+        String username = (String) data.get("username");
 
         List<? extends GrantedAuthority> authorities = ((List<?>) data.get("authorities"))
                 .stream()
@@ -80,7 +82,7 @@ public class MemberService {
                 .map(SimpleGrantedAuthority::new)
                 .toList();
 
-        return new User(id, "", authorities);
+        return new CustomUser(id, username,"", authorities);
 
     }
 

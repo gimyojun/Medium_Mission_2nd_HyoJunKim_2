@@ -53,6 +53,7 @@ public class ApiV1MembersController {
         String accessToken = JwtUtil.encode(
                 Map.of(
                         "id", id.toString(),
+                        "username", member.getUsername(),
                         "authorities", member.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(toList())
                 )
         );
