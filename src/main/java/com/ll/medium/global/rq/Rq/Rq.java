@@ -5,6 +5,7 @@ import com.ll.medium.domain.member.member.service.MemberService;
 import com.ll.medium.global.auth.CustomUser;
 import com.ll.medium.global.rsData.RsData.RsData;
 import com.ll.medium.standard.util.Ut.Ut;
+import jakarta.persistence.EntityManager;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,9 @@ public class Rq {
     private final HttpServletRequest request;
     private final HttpServletResponse response;
     private final MemberService memberService;
+    private Member member;
+    private final EntityManager entityManager;
+
 
     public String redirect(String url, String msg) {
         if(msg == null){
@@ -121,18 +125,15 @@ public class Rq {
         return member;
     }
 
-    public Member getCustomLoginedMember(){
+    public Member getAuthenticatedMemberFromSecurityContext(){
         if (isLogout())
             throw new RuntimeException("rq1 : 로그인이 필요합니다. 로그인 후 다시 시도해주세요.");
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.getPrincipal() instanceof CustomUser) {
+        if(member == null){
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             CustomUser user = (CustomUser) authentication.getPrincipal();
-            Member member = memberService.findByUsername(user.getUsername()).get();
-            if (member == null)
-                return null;
-            return member;
-        } else {
-            throw new RuntimeException("rq : 로그인이 필요합니다. 로그인 후 다시 시도해주세요.");
+            long memberId = user.getId();
+            member = entityManager.getReference(Member.class, memberId);
         }
+        return member;
     }
 }

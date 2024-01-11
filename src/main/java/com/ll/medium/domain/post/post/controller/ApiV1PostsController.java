@@ -109,7 +109,7 @@ public class ApiV1PostsController {
     @PreAuthorize("isAuthenticated()")
     @PostMapping("")
     public RsData<WritePostResponseBody> writePost(@RequestBody WritePostRequestBody body){
-        Member member = rq.getCustomLoginedMember();
+        Member member = rq.getAuthenticatedMemberFromSecurityContext();
         RsData<Post> rsData= postService.writePost(member, body.getTitle(), body.getBody());
 
         return rsData.of(
