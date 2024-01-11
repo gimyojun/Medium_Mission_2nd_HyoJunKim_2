@@ -10,7 +10,7 @@ import java.util.Map;
 public class JwtUtil {
     private static final String SECRET_KEY = "mediumabcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890";
 
-    public static String encode(Map<String, Object> data) {
+    public static String encode(Map<String, Object> data, long expireTime) {
         Claims claims = Jwts
                 .claims()
                 .setSubject("medium jwt token")
@@ -18,11 +18,11 @@ public class JwtUtil {
                 .build();
 
         Date now = new Date();
-        Date validity = new Date(now.getTime() + 1000 * 60 * 60 * 24 * 365); // 1초(1000)  1분(60)  1시간(60)  1일(24) * 7 = 7일
+        Date expiration = new Date(now.getTime() + expireTime); // 1초(1000)  1분(60)  1시간(60)  1일(24) * 7 = 7일
         return Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(now)
-                .setExpiration(validity)
+                .setExpiration(expiration)
                 .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
                 .compact();
     }

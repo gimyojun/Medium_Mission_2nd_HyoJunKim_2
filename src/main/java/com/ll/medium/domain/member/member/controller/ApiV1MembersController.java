@@ -55,7 +55,8 @@ public class ApiV1MembersController {
                         "id", id.toString(),
                         "username", member.getUsername(),
                         "authorities", member.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(toList())
-                )
+                ),
+                (long)1000 * 60 * 60 * 24 * 365
         );
         // return new RsData<LoginResponseBody>
         return rsData.of(new LoginResponseBody(member, accessToken));
