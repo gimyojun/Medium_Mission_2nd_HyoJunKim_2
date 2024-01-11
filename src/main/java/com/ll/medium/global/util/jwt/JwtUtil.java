@@ -18,7 +18,7 @@ public class JwtUtil {
                 .build();
 
         Date now = new Date();
-        Date validity = new Date(now.getTime() + 1000 * 60 * 10); // 1초(1000)  1분(60)  1시간(60)  1일(24) * 7 = 7일
+        Date validity = new Date(now.getTime() + 1000 * 60 * 60 * 24 * 365); // 1초(1000)  1분(60)  1시간(60)  1일(24) * 7 = 7일
         return Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(now)
