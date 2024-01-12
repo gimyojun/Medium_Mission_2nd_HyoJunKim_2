@@ -73,5 +73,37 @@ public class ApiV1MembersController {
         // return new RsData<LoginResponseBody>
         return rsData.of(new LoginResponseBody(member, accessToken, refreshToken));
     }
+    @Getter
+    @Setter
+    public static class RefreshAccessTokenRequestBody {
+        private String refreshToken;
+    }
+    @Getter
+    public static class RefreshAccessTokenResponseBody {
+        private final String accessToken;
+        public RefreshAccessTokenResponseBody(String accessToken) {
+            this.accessToken = accessToken;
+        }
+    }
+
+    @PostMapping("/refreshAccessToken")
+    public RsData<RefreshAccessTokenResponseBody> refreshAccessToken(@RequestBody RefreshAccessTokenRequestBody requestBody) {
+        String refreshToken = requestBody.getRefreshToken();
+        Member member = memberService.findByRefreshToken(refreshToken).get();
+        Long id = member.getId();
+        String accessToken = JwtUtil.encode(
+                Map.of(
+                        "id", id.toString(),
+                        "username", member.getUsername(),
+                        "authorities", member.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(toList())
+                ),
+                (long) 1000 * 60 * 10
+        );
+        return RsData.of( "200",
+                "엑세스 토큰 재발급 성공",
+                new RefreshAccessTokenResponseBody(accessToken)
+        );
+    }
+
 
 }
