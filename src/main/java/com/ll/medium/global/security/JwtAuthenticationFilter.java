@@ -24,8 +24,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // X 붙여주는게 관례다.
         String apiKey = rq.getHeader("X-ApiKey", null);
 
-        if(apiKey != null){
-            CustomUser user = memberService.getUserFromApiKey(apiKey);
+        String accessToken = rq.getCookieValue("accessToken", "");
+        if(!accessToken.isBlank()){
+            String refreshToken = rq.getCookieValue("refreshToken", "");
+            CustomUser user = memberService.getUserFromAccessToken(accessToken);
             rq.setAuthentication(user);
         }
         filterChain.doFilter(request, response);

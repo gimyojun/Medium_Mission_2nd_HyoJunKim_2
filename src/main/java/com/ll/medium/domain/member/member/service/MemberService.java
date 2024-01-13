@@ -68,8 +68,8 @@ public class MemberService {
     }
 
     //쿼리 하나줄임.
-    public CustomUser getUserFromApiKey(String apiKey) {
-        Claims claims = JwtUtil.decode(apiKey);
+    public CustomUser getUserFromAccessToken(String accessToken) {
+        Claims claims = JwtUtil.decode(accessToken);
 
         Map<String, Object> data = (Map<String, Object>) claims.get("data");
         long id = Long.parseLong((String) data.get("id"));
