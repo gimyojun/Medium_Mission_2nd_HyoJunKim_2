@@ -109,4 +109,8 @@ public class PostService {
         postRepository.save(post);
         return RsData.of("200","%d번 게시글이 작성되었습니다.".formatted(post.getId()), post);
     }
+
+    public List<Post> findbyAuthor(Member member) {
+        return postRepository.findByAuthor(member);
+    }
 }

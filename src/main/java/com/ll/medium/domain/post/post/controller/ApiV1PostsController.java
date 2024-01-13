@@ -116,6 +116,11 @@ public class ApiV1PostsController {
                 new WritePostResponseBody(rsData.getData())
         );
     }
-
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/my")
+    public RsData<GetPostsResponseBody> getMyPosts(){
+        Member member = rq.getAuthenticatedMemberFromSecurityContext();
+        return RsData.of("200", "success", new GetPostsResponseBody(postService.findbyAuthor(member)));
+    }
 
 }
