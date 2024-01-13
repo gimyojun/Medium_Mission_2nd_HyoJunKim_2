@@ -20,10 +20,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     @SneakyThrows
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) {
-        System.out.println("JwtAuthenticationFilter 실행");
-        // X 붙여주는게 관례다.
-        String apiKey = rq.getHeader("X-ApiKey", null);
-
+        //로그인과 로그아웃일때는 필터링 하지 않음
+        if(request.getRequestURI().equals("api/v1/members/login") || request.getRequestURI().equals("api/v1/members/logout")){
+            filterChain.doFilter(request, response);
+            return;
+        }
         String accessToken = rq.getCookieValue("accessToken", "");
         if(!accessToken.isBlank()){
             String refreshToken = rq.getCookieValue("refreshToken", "");
