@@ -12,6 +12,8 @@ public class CustomWebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/api/**")
+                //프론트가 배포될거면 실제 사이트 적으면됨
+                //누가 들어올수있는지
                 .allowedOrigins("https://cdpn.io", "http://localhost:5173")
                 .allowedMethods("*")
                 .allowedHeaders("*")
