@@ -9,13 +9,14 @@ import jakarta.persistence.EntityManager;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
-
+import jakarta.servlet.http.Cookie;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
@@ -145,5 +146,87 @@ public class Rq {
         }
 
         return value;
+    }
+
+    // 일반
+    public boolean isAjax() {
+        if ("application/json".equals(request.getHeader("Accept"))) return true;
+        return "XMLHttpRequest".equals(request.getHeader("X-Requested-With"));
+    }
+
+    // 쿠키 관련
+    public void setCookie(String name, String value) {
+        Cookie cookie = new Cookie(name, value);
+        cookie.setPath("/");
+        response.addCookie(cookie);
+    }
+
+    public void setCrossDomainCookie(String name, String value) {
+        ResponseCookie cookie = ResponseCookie.from(name, value)
+                .path("/")
+                .sameSite("None")
+                .secure(true)
+                .httpOnly(true)
+                .build();
+
+        response.addHeader("Set-Cookie", cookie.toString());
+    }
+
+    public Cookie getCookie(String name) {
+        Cookie[] cookies = request.getCookies();
+
+        if (cookies == null) {
+            return null;
+        }
+
+        for (Cookie cookie : cookies) {
+            if (cookie.getName().equals(name)) {
+                return cookie;
+            }
+        }
+
+        return null;
+    }
+
+    public String getCookieValue(String name, String defaultValue) {
+        Cookie cookie = getCookie(name);
+
+        if (cookie == null) {
+            return defaultValue;
+        }
+
+        return cookie.getValue();
+    }
+
+    private long getCookieAsLong(String name, int defaultValue) {
+        String value = getCookieValue(name, null);
+
+        if (value == null) {
+            return defaultValue;
+        }
+
+        return Long.parseLong(value);
+    }
+
+    public void removeCookie(String name) {
+        Cookie cookie = getCookie(name);
+
+        if (cookie == null) {
+            return;
+        }
+
+        cookie.setPath("/");
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
+
+        ResponseCookie responseCookie = ResponseCookie.from(name, null)
+                .path("/")
+                .maxAge(0)
+                .sameSite("None")
+                .secure(true)
+                .httpOnly(true)
+                .build();
+
+        response.addHeader("Set-Cookie", responseCookie.toString());
     }
 }

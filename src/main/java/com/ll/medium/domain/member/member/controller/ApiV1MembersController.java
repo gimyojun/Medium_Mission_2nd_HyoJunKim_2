@@ -36,13 +36,9 @@ public class ApiV1MembersController {
     @Getter
     public static class LoginResponseBody {
         private final MemberDto result;
-        private final String accesToken;
-        private final String refreshToken;
 
-        public LoginResponseBody(Member member, String accesToken, String refreshToken) {
+        public LoginResponseBody(Member member) {
             result = new MemberDto(member);
-            this.accesToken = accesToken;
-            this.refreshToken = refreshToken;
         }
 
     }
@@ -68,10 +64,12 @@ public class ApiV1MembersController {
                 ),
                 (long) 1000 * 60 * 60 * 24 * 365
         );
+        rq.setCrossDomainCookie("accessToken", accessToken);
+        rq.setCrossDomainCookie("refreshToken", refreshToken);
 
         memberService.setRefreshToken(member, refreshToken);
         // return new RsData<LoginResponseBody>
-        return rsData.of(new LoginResponseBody(member, accessToken, refreshToken));
+        return rsData.of(new LoginResponseBody(member));
     }
     @Getter
     @Setter

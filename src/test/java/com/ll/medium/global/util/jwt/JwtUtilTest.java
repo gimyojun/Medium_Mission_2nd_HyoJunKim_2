@@ -15,7 +15,7 @@ public class JwtUtilTest {
                 "name", "김효준",
                 "age", "30"
         );
-        String jwtToken = JwtUtil.encode(map);
+        String jwtToken = JwtUtil.encode(map, 1000 * 60 * 60);
         System.out.println(jwtToken);
         assertThat(jwtToken).isNotNull();
 
