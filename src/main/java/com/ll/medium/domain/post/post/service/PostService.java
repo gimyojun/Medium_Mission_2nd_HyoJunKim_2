@@ -3,21 +3,24 @@ package com.ll.medium.domain.post.post.service;
 import com.ll.medium.domain.member.member.entity.Member;
 import com.ll.medium.domain.post.post.entity.Post;
 import com.ll.medium.domain.post.post.repository.PostRepository;
+import com.ll.medium.global.rsData.RsData.RsData;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class PostService {
     private final PostRepository postRepository;
 
-
-    public void write(Member author, String title, String body, boolean isPublished, boolean isPaid) {
+    @Transactional
+    public RsData<Post> write(Member author, String title, String body, boolean isPublished, boolean isPaid) {
         Post post = Post.builder()
                 .author(author)
                 .title(title)
@@ -29,6 +32,7 @@ public class PostService {
                 .build();
 
         postRepository.save(post);
+        return RsData.of("200","%d번 게시글이 작성되었습니다.".formatted(post.getId()), post);
     }
 
     public Object findTop30ByIsPublishedOrderByIdDesc(boolean isPublished) {
@@ -64,5 +68,49 @@ public class PostService {
 
     }
 
+    public List<Post> findAll() {
+        return postRepository.findAll();
+    }
 
+    public List<Post> findAllByOrderByIdDesc() {
+        return postRepository.findAllByOrderByIdDesc();
+    }
+
+    @Transactional
+    public RsData<Post> deletePost(long id) {
+        Post post = postRepository.findById(id).get();
+        postRepository.deleteById(id);
+
+        return RsData.of("200","%d번 게시글이 삭제 되었습니다.".formatted(id), post);
+
+    }
+
+    @Transactional
+    public RsData<Post> updatePost(Post post, String title, String body) {
+        post.setTitle(title);
+        post.setBody(body);
+        //더티 체킹으로 생략 가능
+        //postRepository.save(post);
+        return RsData.of("200","%d번 게시글이 수정 되었습니다.".formatted(post.getId()), post);
+    }
+
+    @Transactional
+    public RsData<Post> writePost(Member member, String title, String body) {
+        Post post = Post.builder()
+                .author(member)
+                .title(title)
+                .body(body)
+                .isPublished(true)
+                .isPaid(false)
+                .hitCount(0L)
+                .likeCount(0L)
+                .build();
+
+        postRepository.save(post);
+        return RsData.of("200","%d번 게시글이 작성되었습니다.".formatted(post.getId()), post);
+    }
+
+    public List<Post> findbyAuthor(Member member) {
+        return postRepository.findByAuthor(member);
+    }
 }
