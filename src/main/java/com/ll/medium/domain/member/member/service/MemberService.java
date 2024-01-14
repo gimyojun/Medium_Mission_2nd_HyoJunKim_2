@@ -2,12 +2,19 @@ package com.ll.medium.domain.member.member.service;
 
 import com.ll.medium.domain.member.member.entity.Member;
 import com.ll.medium.domain.member.member.repository.MemberRepository;
+import com.ll.medium.global.auth.CustomUser;
 import com.ll.medium.global.rsData.RsData.RsData;
+import com.ll.medium.global.util.jwt.JwtService;
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -16,6 +23,7 @@ import java.util.Optional;
 public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService JwtService;
 
     @Transactional
     public RsData<Member> join(String username, String password, boolean isPaid) {
@@ -40,5 +48,68 @@ public class MemberService {
     public long count() {
         return memberRepository.count();
     }
+
+    public Optional<Member> findById(Long l) {
+        return memberRepository.findById(l);
+    }
+
+    public RsData<Member> checkUsernameAndPassword(String username, String password) {
+
+        Optional<Member> op = memberRepository.findByUsername(username);
+        if (op.isPresent()) {
+            Member member = op.get();
+            if (passwordEncoder.matches(password, member.getPassword())) {
+                return RsData.of("200", "success", member);
+            }else {
+                return RsData.of("400-1", "비밀번호가 일치하지 않습니다.");
+            }
+        }else {
+            return RsData.of("400-2", "존재하지 않는 회원입니다.");
+        }
+    }
+
+    //쿼리 하나줄임.
+    public CustomUser getUserFromAccessToken(String accessToken) {
+        Claims claims = JwtService.decode(accessToken);
+
+        Map<String, Object> data = (Map<String, Object>) claims.get("data");
+        long id = Long.parseLong((String) data.get("id"));
+
+        String username = (String) data.get("username");
+
+        List<? extends GrantedAuthority> authorities = ((List<?>) data.get("authorities"))
+                .stream()
+                .map(String::valueOf) // Convert each element to String
+                .map(SimpleGrantedAuthority::new)
+                .toList();
+
+        return new CustomUser(id, username,"", authorities);
+
+    }
+    @Transactional
+    public void setRefreshToken(Member member, String refreshToken) {
+        member.setRefreshToken(refreshToken);
+    }
+
+    public boolean validateAccessToken(String token) {
+        return JwtService.validateAccessToken(token);
+    }
+
+    public RsData<String> refreshAccessToken(String refreshToken) {
+        Member member = memberRepository.findByRefreshToken(refreshToken).orElseThrow(() -> new RuntimeException("존재하지않는 리프레시 토큰입니다."));
+
+        String accessToken = JwtService.encode(
+                Map.of(
+                        "id", member.getId().toString(),
+                        "username", member.getUsername(),
+                        "authorities", member.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList()
+                ),
+                (long) 1000 * 60 * 10
+        );
+
+
+        return RsData.of("200-1", "토큰 갱신 성공", accessToken);
+    }
+
 
 }

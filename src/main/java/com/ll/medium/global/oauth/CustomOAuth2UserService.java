@@ -4,7 +4,7 @@ import com.ll.medium.domain.member.member.entity.Member;
 import com.ll.medium.domain.member.member.repository.MemberRepository;
 import com.ll.medium.global.oauth.provider.KakaoUserInfo;
 import com.ll.medium.global.oauth.provider.OAuth2UserInfo;
-import com.ll.medium.global.auth.CustomUserDetails;
+import com.ll.medium.global.auth.CustomUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -69,8 +69,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             throw new RuntimeException("해당 소셜로그인은 지원하지 않습니다.");
         }
 
-
-        return new CustomUserDetails(member, oAuth2User.getAttributes());
+        //소셜 로그인(세션)
+        return new CustomUser(member.getId(), member.getUsername(),member.getPassword(),member.getAuthorities(), oAuth2User.getAttributes());
     }
     public Member kakaoMemberJoin(String registrationId, OAuth2User oAuth2User, OAuth2UserInfo oAuth2UserInfo){
 
