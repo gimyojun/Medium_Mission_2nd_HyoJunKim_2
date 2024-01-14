@@ -4,7 +4,7 @@ import com.ll.medium.domain.member.member.entity.Member;
 import com.ll.medium.domain.member.member.repository.MemberRepository;
 import com.ll.medium.global.auth.CustomUser;
 import com.ll.medium.global.rsData.RsData.RsData;
-import com.ll.medium.global.util.jwt.JwtUtil;
+import com.ll.medium.global.util.jwt.JwtService;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -23,6 +23,7 @@ import java.util.Optional;
 public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService JwtService;
 
     @Transactional
     public RsData<Member> join(String username, String password, boolean isPaid) {
@@ -69,7 +70,7 @@ public class MemberService {
 
     //쿼리 하나줄임.
     public CustomUser getUserFromAccessToken(String accessToken) {
-        Claims claims = JwtUtil.decode(accessToken);
+        Claims claims = JwtService.decode(accessToken);
 
         Map<String, Object> data = (Map<String, Object>) claims.get("data");
         long id = Long.parseLong((String) data.get("id"));
@@ -90,8 +91,25 @@ public class MemberService {
         member.setRefreshToken(refreshToken);
     }
 
-
-    public Optional<Member> findByRefreshToken(String refreshToken) {
-        return memberRepository.findByRefreshToken(refreshToken);
+    public boolean validateAccessToken(String token) {
+        return JwtService.validateAccessToken(token);
     }
+
+    public RsData<String> refreshAccessToken(String refreshToken) {
+        Member member = memberRepository.findByRefreshToken(refreshToken).orElseThrow(() -> new RuntimeException("존재하지않는 리프레시 토큰입니다."));
+
+        String accessToken = JwtService.encode(
+                Map.of(
+                        "id", member.getId().toString(),
+                        "username", member.getUsername(),
+                        "authorities", member.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList()
+                ),
+                (long) 1000 * 60 * 10
+        );
+
+
+        return RsData.of("200-1", "토큰 갱신 성공", accessToken);
+    }
+
+
 }

@@ -5,7 +5,7 @@ import com.ll.medium.domain.member.member.entity.Member;
 import com.ll.medium.domain.member.member.service.MemberService;
 import com.ll.medium.global.rq.Rq.Rq;
 import com.ll.medium.global.rsData.RsData.RsData;
-import com.ll.medium.global.util.jwt.JwtUtil;
+import com.ll.medium.global.util.jwt.JwtService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -25,6 +25,7 @@ import static java.util.stream.Collectors.toList;
 public class ApiV1MembersController {
     private final MemberService memberService;
     private final Rq rq;
+    private final JwtService JwtService;
 
     @Getter
     @Setter
@@ -48,15 +49,15 @@ public class ApiV1MembersController {
         RsData<Member> rsData = memberService.checkUsernameAndPassword(requestBody.getUsername(), requestBody.getPassword());
         Member member = rsData.getData();
         Long id = member.getId();
-        String accessToken = JwtUtil.encode(
+        String accessToken = JwtService.encode(
                 Map.of(
                         "id", id.toString(),
                         "username", member.getUsername(),
                         "authorities", member.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(toList())
                 ),
-                (long) 1000 * 60 * 10
+                (long) 1000 * 60 * 10  // 10분짜리 엑세스 토큰
         );
-        String refreshToken = JwtUtil.encode(
+        String refreshToken = JwtService.encode(
                 Map.of(
                         "id", id.toString(),
                         "username", member.getUsername()
@@ -68,7 +69,6 @@ public class ApiV1MembersController {
         rq.setCrossDomainCookie("refreshToken", refreshToken);
 
         memberService.setRefreshToken(member, refreshToken);
-        // return new RsData<LoginResponseBody>
         return rsData.of(new LoginResponseBody(member));
     }
     @Getter
@@ -83,25 +83,5 @@ public class ApiV1MembersController {
             this.accessToken = accessToken;
         }
     }
-
-    @PostMapping("/refreshAccessToken")
-    public RsData<RefreshAccessTokenResponseBody> refreshAccessToken(@RequestBody RefreshAccessTokenRequestBody requestBody) {
-        String refreshToken = requestBody.getRefreshToken();
-        Member member = memberService.findByRefreshToken(refreshToken).get();
-        Long id = member.getId();
-        String accessToken = JwtUtil.encode(
-                Map.of(
-                        "id", id.toString(),
-                        "username", member.getUsername(),
-                        "authorities", member.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(toList())
-                ),
-                (long) 1000 * 60 * 10
-        );
-        return RsData.of( "200",
-                "엑세스 토큰 재발급 성공",
-                new RefreshAccessTokenResponseBody(accessToken)
-        );
-    }
-
 
 }

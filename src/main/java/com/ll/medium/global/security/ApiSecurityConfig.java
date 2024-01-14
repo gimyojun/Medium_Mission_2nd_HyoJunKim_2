@@ -19,15 +19,11 @@ public class ApiSecurityConfig {
         httpSecurity
                 .securityMatcher("/api/**")
                 .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors
                         .configure(httpSecurity)
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
-
         return httpSecurity.build();
-
-
     }
 }
