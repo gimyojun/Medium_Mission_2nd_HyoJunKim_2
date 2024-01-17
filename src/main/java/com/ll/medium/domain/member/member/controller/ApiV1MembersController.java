@@ -6,6 +6,8 @@ import com.ll.medium.domain.member.member.service.MemberService;
 import com.ll.medium.global.rq.Rq.Rq;
 import com.ll.medium.global.rsData.RsData.RsData;
 import com.ll.medium.global.util.jwt.JwtService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -20,7 +22,8 @@ import java.util.Map;
 import static java.util.stream.Collectors.toList;
 
 @RestController
-@RequestMapping("/api/v1/members")
+@RequestMapping(value = "/api/v1/members", produces = "application/json", consumes = "application/json")
+@Tag(name = "ApiV1MembersController", description = "회원가입, 로그인, 로그아웃 컨트롤러")
 @RequiredArgsConstructor
 public class ApiV1MembersController {
     private final MemberService memberService;
@@ -45,6 +48,7 @@ public class ApiV1MembersController {
     }
 
     @PostMapping("/login")
+    @Operation(summary = "로그인", description = "로그인")
     public RsData<LoginResponseBody> login(@RequestBody LoginRequestBody requestBody) {
         RsData<Member> rsData = memberService.checkUsernameAndPassword(requestBody.getUsername(), requestBody.getPassword());
         Member member = rsData.getData();
@@ -70,18 +74,6 @@ public class ApiV1MembersController {
 
         memberService.setRefreshToken(member, refreshToken);
         return rsData.of(new LoginResponseBody(member));
-    }
-    @Getter
-    @Setter
-    public static class RefreshAccessTokenRequestBody {
-        private String refreshToken;
-    }
-    @Getter
-    public static class RefreshAccessTokenResponseBody {
-        private final String accessToken;
-        public RefreshAccessTokenResponseBody(String accessToken) {
-            this.accessToken = accessToken;
-        }
     }
 
 }

@@ -21,6 +21,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     @SneakyThrows
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) {
+        if (!request.getRequestURI().startsWith("/api/")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
         //로그인과 로그아웃일때는 필터링 하지 않음
         if(request.getRequestURI().equals("/api/v1/members/login") || request.getRequestURI().equals("/api/v1/members/logout")){
             filterChain.doFilter(request, response);

@@ -7,6 +7,8 @@ import com.ll.medium.domain.post.post.entity.Post;
 import com.ll.medium.domain.post.post.service.PostService;
 import com.ll.medium.global.rq.Rq.Rq;
 import com.ll.medium.global.rsData.RsData.RsData;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -19,7 +21,8 @@ import java.util.Map;
 //메서드에 @ResponsBody자동으로 붙는다
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/posts")
+@RequestMapping(value = "/api/v1/posts", produces = "application/json", consumes = "application/json")
+@Tag(name = "ApiV1PostsController", description = "게시물 CRUD 컨트롤러")
 public class ApiV1PostsController {
     private final PostService postService;
     private final Rq rq;
@@ -38,6 +41,7 @@ public class ApiV1PostsController {
     }
 
     @GetMapping("")
+    @Operation(summary = "게시물 목록", description = "게시물 목록")
     public RsData<GetPostsResponseBody> getPosts(){
         return RsData.of("200", "success", new GetPostsResponseBody(postService.findAllByOrderByIdDesc()));
     }
@@ -49,6 +53,7 @@ public class ApiV1PostsController {
         }
     }
     @GetMapping("/{id}")
+    @Operation(summary = "게시물 상세", description = "게시물 상세")
     public RsData<GetPostResponseBody> getPost(@PathVariable Long id){
         return RsData.of("200", "success", new GetPostResponseBody(postService.findById(id).get()));
     }
@@ -61,6 +66,7 @@ public class ApiV1PostsController {
         }
     }
     @DeleteMapping("/{id}")
+    @Operation(summary = "게시물 삭제", description = "게시물 삭제")
     public RsData<DeletePostResponseBody> deletePost(@PathVariable Long id){
         RsData<Post> rsData = postService.deletePost(id);
         return RsData.of(
@@ -86,6 +92,7 @@ public class ApiV1PostsController {
         }
     }
     @PutMapping("/{id}")
+    @Operation(summary = "게시물 수정", description = "게시물 수정")
     public RsData<UpdatePostResponseBody> updatePost(@PathVariable Long id, @RequestBody UpdatePostRequestBody body){
         Post post = postService.findById(id).get();
         RsData<Post> rsData = postService.updatePost(post, body.getTitle(), body.getBody());
@@ -108,6 +115,7 @@ public class ApiV1PostsController {
     }
     @PreAuthorize("isAuthenticated()")
     @PostMapping("")
+    @Operation(summary = "게시물 작성", description = "게시물 작성")
     public RsData<WritePostResponseBody> writePost(@RequestBody WritePostRequestBody body){
         Member member = rq.getAuthenticatedMemberFromSecurityContext();
         RsData<Post> rsData= postService.writePost(member, body.getTitle(), body.getBody());
@@ -118,6 +126,7 @@ public class ApiV1PostsController {
     }
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/my")
+    @Operation(summary = "내 게시물 목록", description = "내 게시물 목록")
     public RsData<GetPostsResponseBody> getMyPosts(){
         Member member = rq.getAuthenticatedMemberFromSecurityContext();
         return RsData.of("200", "success", new GetPostsResponseBody(postService.findbyAuthor(member)));
